@@ -94,9 +94,11 @@ public partial class WorkspaceLayoutView : ContentView
     private void OnLayoutSizeChanged(object? sender, EventArgs e)
     {
         var isCompact = Width < 820;
-        LayoutGrid.ColumnDefinitions[0].Width = isCompact ? new GridLength(0) : new GridLength(232);
-        Sidebar.IsVisible = !isCompact;
-        MobileNavButton.IsVisible = isCompact;
+        var isSeller = (Shell.Current as AppShell)?.CurrentEmployee?.Role == lojavendas.Models.EmployeeRoles.Seller;
+        var showSidebar = !isCompact && !isSeller;
+        LayoutGrid.ColumnDefinitions[0].Width = showSidebar ? new GridLength(232) : new GridLength(0);
+        Sidebar.IsVisible = showSidebar;
+        MobileNavButton.IsVisible = isCompact && !isSeller;
         ProfileDetails.IsVisible = !isCompact;
         HeaderGrid.Padding = isCompact ? new Thickness(12, 0) : new Thickness(24, 0);
         BodyHost.Padding = isCompact ? new Thickness(16, 16) : new Thickness(24, 20);

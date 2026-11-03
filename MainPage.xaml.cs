@@ -19,6 +19,22 @@ namespace lojavendas
             _logger = logger;
         }
 
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            ResetLoginForm();
+        }
+
+        private void ResetLoginForm()
+        {
+            LoginEntry.Text = string.Empty;
+            PasswordEntry.Text = string.Empty;
+            _isPasswordVisible = false;
+            PasswordEntry.IsPassword = true;
+            PasswordVisibilityButton.Text = "Mostrar";
+            SemanticProperties.SetDescription(PasswordVisibilityButton, "Mostrar senha");
+        }
+
         private void OnPageSizeChanged(object? sender, EventArgs e)
         {
             if (Width <= 0 || Height <= 0)
@@ -81,15 +97,20 @@ namespace lojavendas
 
                 if (!isAuthenticated)
                 {
+                    ResetLoginForm();
                     await DisplayAlertAsync(
                         "Login inválido",
                         "Confira seu login e senha e tente novamente.",
                         "OK");
+                    LoginEntry.Focus();
                     return;
                 }
 
                 try
                 {
+                    if (Shell.Current is AppShell appShell)
+                        appShell.UpdateWorkspaceAccess();
+
                     var destination = _authenticationService.CurrentEmployee?.Role == EmployeeRoles.Seller
                         ? "//workspace/main/checkout"
                         : "//workspace/main/sales";

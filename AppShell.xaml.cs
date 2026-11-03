@@ -34,6 +34,7 @@ namespace lojavendas
             AnalyticsShellContent.ContentTemplate = new DataTemplate(() => serviceProvider.GetRequiredService<AnalyticsPage>());
             CheckoutShellContent.ContentTemplate = new DataTemplate(() => serviceProvider.GetRequiredService<CheckoutPage>());
             DebtorsShellContent.ContentTemplate = new DataTemplate(() => serviceProvider.GetRequiredService<DebtorsPage>());
+            UpdateWorkspaceAccess();
             Navigating += OnShellNavigating;
         }
 
@@ -45,17 +46,35 @@ namespace lojavendas
         public async Task SignOutAsync()
         {
             _authenticationService.SignOut();
+            UpdateWorkspaceAccess();
             await GoToAsync("//login/main/form");
+        }
+
+        public void UpdateWorkspaceAccess()
+        {
+            var employee = CurrentEmployee;
+            var isActive = employee?.IsActive == true;
+            var isAdministrator = isActive && employee?.Role == EmployeeRoles.Administration;
+            var canAccessSales = isActive &&
+                                 employee?.Role is EmployeeRoles.Administration or EmployeeRoles.Manager;
+            var canAccessDebtors = canAccessSales;
+
+            SalesShellContent.IsVisible = canAccessSales;
+            EmployeesShellContent.IsVisible = isAdministrator;
+            ProductsShellContent.IsVisible = isAdministrator;
+            AnalyticsShellContent.IsVisible = isAdministrator;
+            CheckoutShellContent.IsVisible = isActive;
+            DebtorsShellContent.IsVisible = canAccessDebtors;
         }
 
         private void OnShellNavigating(object? sender, ShellNavigatingEventArgs args)
         {
             var target = args.Target.Location.OriginalString;
-            if (!target.Contains("/workspace/", StringComparison.OrdinalIgnoreCase) ||
+            if (!IsWorkspaceRoute(target) ||
                 CanAccessRoute(target))
             {
                 if (!_dailyBackupStarted &&
-                    target.Contains("/workspace/", StringComparison.OrdinalIgnoreCase) &&
+                    IsWorkspaceRoute(target) &&
                     CurrentEmployee is not null)
                 {
                     _dailyBackupStarted = true;
@@ -94,16 +113,27 @@ namespace lojavendas
             if (employee.Role == EmployeeRoles.Administration)
                 return true;
 
-            var isSalesArea = route.Contains("/sales", StringComparison.OrdinalIgnoreCase) ||
-                              route.Contains("/checkout", StringComparison.OrdinalIgnoreCase) ||
-                              route.Contains("/debts", StringComparison.OrdinalIgnoreCase);
             return employee.Role switch
             {
-                EmployeeRoles.Manager => isSalesArea,
-                EmployeeRoles.Seller => route.Contains("/checkout", StringComparison.OrdinalIgnoreCase),
+                EmployeeRoles.Manager => IsAllowedWorkspacePage(route, "sales", "checkout", "debts"),
+                EmployeeRoles.Seller => IsAllowedWorkspacePage(route, "checkout"),
                 _ => false
             };
         }
+
+        private static bool IsWorkspaceRoute(string route) =>
+            GetRouteSegments(route).Any(segment =>
+                string.Equals(segment, "workspace", StringComparison.OrdinalIgnoreCase));
+
+        private static bool IsAllowedWorkspacePage(string route, params string[] allowedPages)
+        {
+            var segments = GetRouteSegments(route);
+            var page = segments.LastOrDefault();
+            return page is not null && allowedPages.Contains(page, StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static string[] GetRouteSegments(string route) =>
+            route.Split(['/', '?', '#'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         private async Task CreateDailyBackupAsync()
         {
