@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="lojavendas.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="lojavendas">
+
+    <ShellItem Route="login">
+        <ShellSection Route="main">
+            <ShellContent x:Name="MainShellContent" Route="form" />
+        </ShellSection>
+    </ShellItem>
+
+    <ShellItem Route="workspace" Shell.TabBarIsVisible="False">
+        <ShellSection Route="main" Shell.TabBarIsVisible="False">
+            <ShellContent
+                x:Name="SalesShellContent"
+                Route="sales"
+                Title="Vendas" />
+            <ShellContent
+                x:Name="EmployeesShellContent"
+                Route="employees"
+                Title="Funcionários" />
+            <ShellContent
+                x:Name="ProductsShellContent"
+                Route="products"
+                Title="Produtos" />
+            <ShellContent
+                x:Name="AnalyticsShellContent"
+                Route="analytics"
+                Title="Análise de vendas" />
+            <ShellContent
+                x:Name="CheckoutShellContent"
+                Route="checkout"
+                Title="Caixa" />
+            <ShellContent
+                x:Name="DebtorsShellContent"
+                Route="debts"
+                Title="Devedores" />
+        </ShellSection>
+    </ShellItem>
+
+</Shell>

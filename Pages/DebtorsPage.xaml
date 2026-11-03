@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="lojavendas.Pages.DebtorsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:lojavendas.Models"
+    xmlns:views="clr-namespace:lojavendas.Views"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
+    <views:WorkspaceLayoutView ActiveRoute="debts" Breadcrumb="Vendas">
+        <views:WorkspaceLayoutView.Body>
+            <VerticalStackLayout Spacing="18">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Spacing="4">
+                        <Button Text="‹  Voltar para vendas" HorizontalOptions="Start" BackgroundColor="Transparent" TextColor="#727871" FontFamily="Inter" FontSize="14" Padding="0,6" Clicked="OnBackToSalesClicked" />
+                        <Label Text="Devedores" FontFamily="Inter" FontSize="30" TextColor="#242B28" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="＋ Nova venda" BackgroundColor="#293F35" TextColor="White" FontFamily="Inter" FontSize="13" Padding="14,10" Clicked="OnCheckoutClicked" />
+                </Grid>
+                <Border Padding="20" BackgroundColor="#293F35" StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Total a receber" FontFamily="Inter" FontSize="14" TextColor="#D7DBD2" />
+                            <Label x:Name="OutstandingTotalLabel" Text="R$ 0,00" FontFamily="Inter" FontSize="30" TextColor="White" />
+                            <Label x:Name="OutstandingCountLabel" Text="0 vendas pendentes" FontFamily="Inter" FontSize="13" TextColor="#D4E6B0" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+                <Border BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout Spacing="0">
+                        <Label x:Name="DebtListTitle" Text="Vendas a prazo  0" Padding="18,18" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                        <CollectionView ItemsSource="{Binding Debts}" SelectionMode="None">
+                            <CollectionView.EmptyView>
+                                <VerticalStackLayout Padding="24" Spacing="8" HorizontalOptions="Center">
+                                    <Label Text="Nenhuma venda a prazo" FontFamily="Inter" FontSize="16" TextColor="#242B28" HorizontalTextAlignment="Center" />
+                                    <Label Text="As vendas a prazo e seus comprovantes aparecerão aqui." FontFamily="Inter" FontSize="14" TextColor="#727871" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:SaleRecord">
+                                    <VerticalStackLayout Padding="16,14" Spacing="12">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                            <VerticalStackLayout Spacing="4">
+                                                <Label Text="{Binding CustomerDisplay}" FontFamily="Inter" FontSize="17" TextColor="#242B28" />
+                                                <Label Text="{Binding SellerName, StringFormat='Atendente: {0}'}" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                                            </VerticalStackLayout>
+                                            <Label Grid.Column="1" Text="{Binding Status}" FontFamily="Inter" FontSize="13" TextColor="#A97528" VerticalTextAlignment="Center" />
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto" RowSpacing="10">
+                                            <VerticalStackLayout Spacing="3">
+                                                <Label Text="Venda / data" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                                                <Label Text="{Binding SaleNumber}" FontFamily="Inter" FontSize="14" TextColor="#293F35" />
+                                                <Label Text="{Binding CreatedAtText}" FontFamily="Inter" FontSize="13" TextColor="#242B28" />
+                                            </VerticalStackLayout>
+                                            <VerticalStackLayout Grid.Column="1" Spacing="3">
+                                                <Label Text="Saldo devedor" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                                                <Label Text="{Binding OutstandingText}" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                                            </VerticalStackLayout>
+                                            <VerticalStackLayout Grid.Row="1" Spacing="3">
+                                                <Label Text="Último pagamento" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                                                <Label Text="{Binding LatestPaymentMethodText}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                                <Button Text="Receber"
+                                                        BackgroundColor="#293F35"
+                                                        TextColor="White"
+                                                        FontFamily="Inter"
+                                                        FontSize="14"
+                                                        Padding="12,10"
+                                                        IsVisible="{Binding CanReceivePayment}"
+                                                        Clicked="OnRegisterDebtPaymentClicked" />
+                                                <Button Grid.Column="1" Text="Comprovantes"
+                                                        BackgroundColor="White"
+                                                        TextColor="#293F35"
+                                                        BorderColor="#D7DBD2"
+                                                        FontFamily="Inter"
+                                                        FontSize="14"
+                                                        Padding="12,10"
+                                                        Clicked="OnPaymentReceiptsClicked" />
+                                        </Grid>
+                                        <BoxView HeightRequest="1" Color="#E4E6DF" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </views:WorkspaceLayoutView.Body>
+    </views:WorkspaceLayoutView>
+</ContentPage>

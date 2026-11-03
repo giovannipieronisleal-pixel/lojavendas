@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="lojavendas.Pages.EmployeeEditorPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    BackgroundColor="#66000000">
+    <Grid Padding="24">
+        <ScrollView VerticalOptions="Fill"
+                    HorizontalOptions="Fill"
+                    VerticalScrollBarVisibility="Always">
+            <Border MaximumWidthRequest="560"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Margin="0,8"
+                    Padding="24"
+                    BackgroundColor="#F6F5F0"
+                    Stroke="#D7DBD2"
+                    StrokeShape="RoundRectangle 14">
+                <VerticalStackLayout Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Spacing="4">
+                            <Label x:Name="TitleLabel" Text="Criar funcionário" FontFamily="Inter" FontSize="20" TextColor="#242B28" />
+                            <Label Text="Preencha os dados e defina o acesso à loja." FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" Text="✕" BackgroundColor="Transparent" TextColor="#727871" Padding="8,2" Clicked="OnCancelClicked" />
+                    </Grid>
+
+                    <Label Text="Nome completo" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                    <Entry x:Name="NameEntry"
+                           Placeholder="Nome do funcionário"
+                           FontFamily="Inter"
+                           FontSize="12"
+                           TextColor="#242B28"
+                           PlaceholderColor="#727871"
+                           BackgroundColor="White" />
+
+                    <Label Text="Usuário para entrar" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                    <Entry x:Name="UsernameEntry"
+                           Placeholder="Ex.: maria.silva"
+                           FontFamily="Inter"
+                           FontSize="12"
+                           TextColor="#242B28"
+                           PlaceholderColor="#727871"
+                           BackgroundColor="White" />
+
+                    <Label x:Name="PasswordLabel" Text="Senha" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                    <Entry x:Name="PasswordEntry"
+                           Placeholder="Crie uma senha"
+                           IsPassword="True"
+                           FontFamily="Inter"
+                           FontSize="12"
+                           TextColor="#242B28"
+                           PlaceholderColor="#727871"
+                           BackgroundColor="White" />
+                    <Label x:Name="PasswordHint" Text="No modo de edição, deixe em branco para manter a senha atual." FontFamily="Inter" FontSize="9" TextColor="#727871" IsVisible="False" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Cargo" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                            <Picker x:Name="RolePicker"
+                                    Title="Selecione o cargo"
+                                    FontFamily="Inter"
+                                    FontSize="11"
+                                    TextColor="#242B28"
+                                    TitleColor="#727871"
+                                    BackgroundColor="White"
+                                    IsEnabled="True" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Equipe" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                            <Entry x:Name="TeamEntry"
+                                   Placeholder="Ex.: Vendas"
+                                   FontFamily="Inter"
+                                   FontSize="11"
+                                   TextColor="#242B28"
+                                   PlaceholderColor="#727871"
+                                   BackgroundColor="White"
+                                   IsEnabled="True" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Acesso à plataforma" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
+                            <Label x:Name="ActiveStatusLabel" Text="Ativo" FontFamily="Inter" FontSize="9" TextColor="#727871" />
+                        </VerticalStackLayout>
+                        <Switch x:Name="ActiveSwitch" Grid.Column="1" IsToggled="True" OnColor="#416349" />
+                    </Grid>
+
+                    <Label x:Name="ErrorLabel" IsVisible="False" FontFamily="Inter" FontSize="10" TextColor="#B84F42" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,6,0,0">
+                        <Button Text="Cancelar" BackgroundColor="White" TextColor="#293F35" BorderColor="#D7DBD2" BorderWidth="1" FontFamily="Inter" FontSize="11" Clicked="OnCancelClicked" />
+                        <Button Grid.Column="1" Text="Salvar funcionário" BackgroundColor="#293F35" TextColor="White" FontFamily="Inter" FontSize="11" Clicked="OnSaveClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </ScrollView>
+    </Grid>
+</ContentPage>

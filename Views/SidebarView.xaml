@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="lojavendas.Views.SidebarView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Name="RootView">
+    <Grid BackgroundColor="#293F35"
+          RowDefinitions="Auto,Auto,Auto,*,Auto,Auto"
+          WidthRequest="232">
+        <HorizontalStackLayout Grid.Row="0"
+                               Margin="32,30,20,0"
+                               Spacing="10"
+                               VerticalOptions="Center">
+            <Image Source="nav_brand.svg"
+                   WidthRequest="18"
+                   HeightRequest="18" />
+            <Label Text="acesso"
+                   FontFamily="Inter"
+                   FontSize="18"
+                   TextColor="White"
+                   VerticalTextAlignment="Center" />
+        </HorizontalStackLayout>
+
+        <Label Grid.Row="1"
+               Text="GESTÃO INTERNA"
+               Margin="14,36,0,12"
+               FontFamily="Inter"
+               FontSize="9"
+               CharacterSpacing="1.5"
+               TextColor="#B8C4B8" />
+
+        <VerticalStackLayout Grid.Row="2"
+                             Margin="14,0"
+                             Spacing="4">
+            <Grid x:Name="EmployeesNav" HeightRequest="48">
+                <Border x:Name="EmployeesBackground"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 6">
+                    <HorizontalStackLayout Margin="10,0" Spacing="10">
+                        <Image x:Name="EmployeesIcon" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Label x:Name="EmployeesLabel" Text="Funcionários" FontFamily="Inter" FontSize="12" TextColor="#F3F4E9" VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Button BackgroundColor="Transparent" Clicked="OnEmployeesClicked" SemanticProperties.Description="Funcionários" />
+            </Grid>
+            <Grid x:Name="SalesNav" HeightRequest="48">
+                <Border x:Name="SalesBackground"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 6">
+                    <HorizontalStackLayout Margin="10,0" Spacing="10">
+                        <Image x:Name="SalesIcon" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Label x:Name="SalesLabel" Text="Vendas" FontFamily="Inter" FontSize="12" TextColor="#F3F4E9" VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Button BackgroundColor="Transparent" Clicked="OnSalesClicked" SemanticProperties.Description="Vendas" />
+            </Grid>
+            <Grid x:Name="ProductsNav" HeightRequest="48">
+                <Border x:Name="ProductsBackground"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 6">
+                    <HorizontalStackLayout Margin="10,0" Spacing="10">
+                        <Image x:Name="ProductsIcon" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Label x:Name="ProductsLabel" Text="Produtos" FontFamily="Inter" FontSize="12" TextColor="#F3F4E9" VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Button BackgroundColor="Transparent" Clicked="OnProductsClicked" SemanticProperties.Description="Produtos" />
+            </Grid>
+            <Grid x:Name="AnalyticsNav" HeightRequest="48">
+                <Border x:Name="AnalyticsBackground"
+                        StrokeThickness="0"
+                        BackgroundColor="Transparent"
+                        StrokeShape="RoundRectangle 6">
+                    <HorizontalStackLayout Margin="10,0" Spacing="10">
+                        <Image x:Name="AnalyticsIcon" WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Label x:Name="AnalyticsLabel" Text="Análise de vendas" FontFamily="Inter" FontSize="12" TextColor="#F3F4E9" VerticalTextAlignment="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+                <Button BackgroundColor="Transparent" Clicked="OnAnalyticsClicked" SemanticProperties.Description="Análise de vendas" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <Border Grid.Row="4"
+                Margin="14,0"
+                Padding="12"
+                Stroke="#52675E"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 6">
+            <VerticalStackLayout Spacing="5">
+                <HorizontalStackLayout Spacing="8">
+                    <Image Source="nav_store.svg" WidthRequest="14" HeightRequest="14" />
+                    <Button x:Name="StoreNameButton"
+                            Text="Loja Centro"
+                            BackgroundColor="Transparent"
+                            Padding="0"
+                            FontFamily="Inter"
+                            FontSize="11"
+                            TextColor="#F3F4E9"
+                            HorizontalOptions="Start"
+                            Clicked="OnStoreNameClicked"
+                            SemanticProperties.Description="Alterar nome da loja" />
+                </HorizontalStackLayout>
+                <Label Text="Exclusivo para funcionários"
+                       FontFamily="Inter"
+                       FontSize="9"
+                       TextColor="#B8C4B8" />
+            </VerticalStackLayout>
+        </Border>
+
+        <HorizontalStackLayout Grid.Row="5"
+                               Margin="22,22,0,20"
+                               Spacing="8">
+            <Image Source="nav_help.svg" WidthRequest="14" HeightRequest="14" VerticalOptions="Center" />
+            <Label Text="Central de ajuda"
+                   FontFamily="Inter"
+                   FontSize="11"
+                   TextColor="#D7DBD2"
+                   VerticalTextAlignment="Center" />
+        </HorizontalStackLayout>
+    </Grid>
+</ContentView>

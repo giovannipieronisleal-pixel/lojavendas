@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="lojavendas.Pages.AnalyticsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:lojavendas.Pages"
+    xmlns:scottplot="clr-namespace:ScottPlot.Maui;assembly=ScottPlot.Maui"
+    xmlns:views="clr-namespace:lojavendas.Views"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
+    <views:WorkspaceLayoutView ActiveRoute="analytics" Breadcrumb="Análise de vendas">
+        <views:WorkspaceLayoutView.Body>
+            <VerticalStackLayout Spacing="20">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="5">
+                        <Label Text="Análise de vendas" FontFamily="Inter" FontSize="28" TextColor="#242B28" />
+                        <Label Text="Indicadores reais do banco local para apoiar suas decisões." FontFamily="Inter" FontSize="14" TextColor="#727871" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Text="Exportar CSV"
+                            BackgroundColor="#293F35"
+                            TextColor="White"
+                            FontFamily="Inter"
+                            FontSize="14"
+                            Padding="14,10"
+                            Clicked="OnExportClicked" />
+                </Grid>
+
+                <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Período e equipe" FontFamily="Inter" FontSize="17" TextColor="#242B28" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+                            <Label Text="De" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                            <Label Grid.Column="1" Text="Até" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                            <DatePicker x:Name="StartDatePicker"
+                                        Grid.Row="1"
+                                        Format="dd/MM/yyyy"
+                                        FontFamily="Inter"
+                                        FontSize="15"
+                                        TextColor="#242B28"
+                                        DateSelected="OnFilterChanged" />
+                            <DatePicker x:Name="EndDatePicker"
+                                        Grid.Row="1"
+                                        Grid.Column="1"
+                                        Format="dd/MM/yyyy"
+                                        FontFamily="Inter"
+                                        FontSize="15"
+                                        TextColor="#242B28"
+                                        DateSelected="OnFilterChanged" />
+                            <Label Grid.Row="2" Text="Vendedor" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                            <Picker x:Name="SellerPicker"
+                                    Grid.Row="3"
+                                    Grid.ColumnSpan="2"
+                                    FontFamily="Inter"
+                                    FontSize="15"
+                                    TextColor="#242B28"
+                                    SelectedIndexChanged="OnFilterChanged" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <views:ResponsiveGrid MaximumColumns="2" MinimumColumnWidth="280" ColumnSpacing="12" RowSpacing="12">
+                    <Border Padding="16" BackgroundColor="#293F35" StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="7">
+                            <Label Text="Receita no período" FontFamily="Inter" FontSize="14" TextColor="#D7DBD2" />
+                            <Label x:Name="RevenueLabel" Text="R$ 0,00" FontFamily="Inter" FontSize="25" TextColor="White" />
+                            <Label x:Name="RevenueDetailLabel" Text="Vendas concluídas e pagamentos recebidos" FontFamily="Inter" FontSize="12" TextColor="#D4E6B0" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="7">
+                            <Label Text="Vendas concluídas" FontFamily="Inter" FontSize="14" TextColor="#727871" />
+                            <Label x:Name="CompletedSalesLabel" Text="0" FontFamily="Inter" FontSize="25" TextColor="#242B28" />
+                            <Label x:Name="CompletionRateLabel" Text="0% das vendas do período" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="7">
+                            <Label Text="Ticket médio" FontFamily="Inter" FontSize="14" TextColor="#727871" />
+                            <Label x:Name="AverageTicketLabel" Text="R$ 0,00" FontFamily="Inter" FontSize="25" TextColor="#242B28" />
+                            <Label Text="Por venda concluída" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="7">
+                            <Label Text="Saldo de devedores" FontFamily="Inter" FontSize="14" TextColor="#727871" />
+                            <Label x:Name="OutstandingDebtLabel" Text="R$ 0,00" FontFamily="Inter" FontSize="25" TextColor="#242B28" />
+                            <Label x:Name="OutstandingDebtCountLabel" Text="0 vendas pendentes" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                </views:ResponsiveGrid>
+
+                <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Receita ao longo do período" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                        <Label Text="Valores recebidos por dia, incluindo pagamentos de dívidas." FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                        <Label x:Name="RevenueChartEmptyLabel"
+                               Text="Sem receita no período selecionado."
+                               IsVisible="False"
+                               FontFamily="Inter"
+                               FontSize="13"
+                               TextColor="#727871" />
+                        <scottplot:MauiPlot x:Name="RevenuePlot"
+                                            HeightRequest="280"
+                                            MinimumHeightRequest="220"
+                                            Loaded="OnRevenuePlotLoaded"
+                                            SizeChanged="OnRevenuePlotSizeChanged" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <views:ResponsiveGrid MaximumColumns="2" MinimumColumnWidth="340" ColumnSpacing="12" RowSpacing="12">
+                    <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Produtos mais vendidos" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                            <VerticalStackLayout x:Name="TopProductsList" Spacing="10">
+                                <VerticalStackLayout.BindableLayout.ItemsSource>
+                                    <Binding Path="TopProducts" />
+                                </VerticalStackLayout.BindableLayout.ItemsSource>
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:AnalyticsProductRow">
+                                        <VerticalStackLayout Spacing="4">
+                                            <Grid ColumnDefinitions="*,Auto">
+                                                <Label Text="{Binding Name}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                                <Label Grid.Column="1" Text="{Binding QuantityText}" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                                            </Grid>
+                                            <ProgressBar Progress="{Binding Share}" ProgressColor="#52675E" BackgroundColor="#E9EBE5" />
+                                        </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Vendas por forma de pagamento" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                            <Label x:Name="PaymentChartEmptyLabel"
+                                   Text="Sem pagamentos no período selecionado."
+                                   IsVisible="False"
+                                   FontFamily="Inter"
+                                   FontSize="13"
+                                   TextColor="#727871" />
+                            <scottplot:MauiPlot x:Name="PaymentPlot"
+                                                HeightRequest="240"
+                                                MinimumHeightRequest="200"
+                                                Loaded="OnPaymentPlotLoaded"
+                                                SizeChanged="OnPaymentPlotSizeChanged" />
+                            <VerticalStackLayout x:Name="PaymentMethodsList" Spacing="6">
+                                <VerticalStackLayout.BindableLayout.ItemsSource>
+                                    <Binding Path="PaymentMethods" />
+                                </VerticalStackLayout.BindableLayout.ItemsSource>
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:AnalyticsPaymentRow">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <Label Text="{Binding Name}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                            <Label Grid.Column="1" Text="{Binding AmountText}" FontFamily="Inter" FontSize="14" TextColor="#293F35" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </views:ResponsiveGrid>
+
+                <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Desempenho da equipe" FontFamily="Inter" FontSize="18" TextColor="#242B28" />
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <Label Text="Vendedor" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                            <Label Grid.Column="1" Text="Vendas" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                            <Label Grid.Column="2" Text="Valor vendido" FontFamily="Inter" FontSize="13" TextColor="#727871" />
+                        </Grid>
+                        <VerticalStackLayout x:Name="SellerPerformanceList" Spacing="8">
+                            <VerticalStackLayout.BindableLayout.ItemsSource>
+                                <Binding Path="SellerPerformance" />
+                            </VerticalStackLayout.BindableLayout.ItemsSource>
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="pages:AnalyticsSellerRow">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                        <Label Text="{Binding Name}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                        <Label Grid.Column="1" Text="{Binding SalesCount}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                        <Label Grid.Column="2" Text="{Binding RevenueText}" FontFamily="Inter" FontSize="14" TextColor="#293F35" />
+                                    </Grid>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Padding="16" BackgroundColor="#EBEFE6" StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="5">
+                            <Label Text="Backup local diário" FontFamily="Inter" FontSize="17" TextColor="#242B28" />
+                            <Label x:Name="BackupStatusLabel" Text="Verificando backup..." FontFamily="Inter" FontSize="13" TextColor="#52675E" />
+                            <Label Text="Os arquivos ficam neste dispositivo; mantenha uma cópia externa para proteger contra perda do aparelho." FontFamily="Inter" FontSize="12" TextColor="#52675E" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1"
+                                Text="Fazer backup agora"
+                                BackgroundColor="#293F35"
+                                TextColor="White"
+                                FontFamily="Inter"
+                                FontSize="13"
+                                Padding="12,10"
+                                Clicked="OnCreateBackupClicked" />
+                    </Grid>
+                </Border>
+
+                <Label x:Name="UpdatedAtLabel" Text="Atualizando dados..." FontFamily="Inter" FontSize="12" TextColor="#727871" />
+            </VerticalStackLayout>
+        </views:WorkspaceLayoutView.Body>
+    </views:WorkspaceLayoutView>
+</ContentPage>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="lojavendas.Pages.ProductsPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:models="clr-namespace:lojavendas.Models"
+    xmlns:views="clr-namespace:lojavendas.Views"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
+    <views:WorkspaceLayoutView ActiveRoute="products" Breadcrumb="Produtos">
+        <views:WorkspaceLayoutView.Body>
+            <VerticalStackLayout Spacing="20">
+                <Grid ColumnDefinitions="*,Auto">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Produtos" FontFamily="Inter" FontSize="28" TextColor="#242B28" />
+                        <Label Text="Seu catálogo organizado. Seu estoque sob controle." FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="＋  Novo produto" BackgroundColor="#293F35" TextColor="White" FontFamily="Inter" FontSize="12" Clicked="OnNewProductClicked" />
+                </Grid>
+                <views:ResponsiveGrid MaximumColumns="4" MinimumColumnWidth="165" ColumnSpacing="12" RowSpacing="12">
+                    <Border Padding="18" BackgroundColor="#293F35" StrokeThickness="0" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Produtos no catálogo" FontFamily="Inter" FontSize="11" TextColor="#D7DBD2" />
+                            <Label x:Name="ProductCountLabel" Text="0" FontFamily="Inter" FontSize="24" TextColor="White" />
+                            <Label Text="Produtos cadastrados" FontFamily="Inter" FontSize="10" TextColor="#D4E6B0" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="18" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Unidades em estoque" FontFamily="Inter" FontSize="11" TextColor="#727871" />
+                            <Label x:Name="StockCountLabel" Text="0" FontFamily="Inter" FontSize="24" TextColor="#242B28" />
+                            <Label Text="Somatório do estoque" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="18" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Estoque baixo" FontFamily="Inter" FontSize="11" TextColor="#727871" />
+                            <Label x:Name="LowStockCountLabel" Text="0" FontFamily="Inter" FontSize="24" TextColor="#242B28" />
+                            <Label Text="Menos de 10 unidades" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="18" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <VerticalStackLayout Spacing="8">
+                            <Label Text="Sem estoque" FontFamily="Inter" FontSize="11" TextColor="#727871" />
+                            <Label x:Name="OutOfStockCountLabel" Text="0" FontFamily="Inter" FontSize="24" TextColor="#242B28" />
+                            <Label Text="Produtos indisponíveis" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                        </VerticalStackLayout>
+                    </Border>
+                </views:ResponsiveGrid>
+                <Border BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <VerticalStackLayout Spacing="0">
+                        <Label x:Name="ProductListCountLabel" Text="Todos os produtos  0" Padding="18,16" FontFamily="Inter" FontSize="12" FontAttributes="Bold" TextColor="#293F35" />
+                        <CollectionView ItemsSource="{Binding Products}" SelectionMode="None">
+                            <CollectionView.EmptyView>
+                                <VerticalStackLayout Padding="24" Spacing="6" HorizontalOptions="Center">
+                                    <Label Text="Nenhum produto cadastrado" FontFamily="Inter" FontSize="13" TextColor="#242B28" HorizontalTextAlignment="Center" />
+                                    <Label Text="Use “Novo produto” para começar o catálogo." FontFamily="Inter" FontSize="10" TextColor="#727871" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="models:ProductRecord">
+                                    <VerticalStackLayout Spacing="0">
+                                        <Grid Padding="16,12" RowDefinitions="Auto,Auto" RowSpacing="8">
+                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                                <Label Text="{Binding Name}" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                                <Label Grid.Column="1" Text="{Binding PriceText}" FontFamily="Inter" FontSize="14" TextColor="#293F35" VerticalTextAlignment="Center" />
+                                            </Grid>
+                                            <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                                                <VerticalStackLayout Spacing="2">
+                                                    <Label Text="Código" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                                                    <Label Text="{Binding Code}" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                                    <Label Text="Categoria" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                                                    <Label Text="{Binding Category}" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                                    <Label Text="Estoque" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                                                    <Label Text="{Binding StockText}" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                                </VerticalStackLayout>
+                                            </Grid>
+                                        </Grid>
+                                        <BoxView HeightRequest="1" Color="#E4E6DF" />
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </views:WorkspaceLayoutView.Body>
+    </views:WorkspaceLayoutView>
+</ContentPage>

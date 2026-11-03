@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView
+    x:Class="lojavendas.Views.WorkspaceLayoutView"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:lojavendas.Views"
+    x:Name="RootView">
+    <Grid x:Name="LayoutGrid"
+          ColumnDefinitions="232,*"
+          BackgroundColor="#F6F5F0"
+          SizeChanged="OnLayoutSizeChanged">
+        <views:SidebarView x:Name="Sidebar" Grid.Column="0" />
+
+        <Grid x:Name="ContentGrid" Grid.Column="1" RowDefinitions="80,*">
+            <Grid x:Name="HeaderGrid"
+                  Grid.Row="0"
+                  Padding="24,0"
+                  ColumnDefinitions="*,Auto,Auto"
+                  ColumnSpacing="12"
+                  BackgroundColor="#F6F5F0">
+                <HorizontalStackLayout Grid.Column="0"
+                                       Spacing="12"
+                                       VerticalOptions="Center">
+                    <Label x:Name="AreaLabel"
+                           Text="Área interna"
+                           FontFamily="Inter"
+                           FontSize="11"
+                           TextColor="#727871"
+                           VerticalTextAlignment="Center" />
+                    <Label x:Name="BreadcrumbSeparator"
+                           Text="/"
+                           FontFamily="Inter"
+                           FontSize="11"
+                           TextColor="#9A9E96"
+                           VerticalTextAlignment="Center" />
+                    <Label x:Name="BreadcrumbLabel"
+                           FontFamily="Inter"
+                           FontSize="11"
+                           TextColor="#242B28"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
+                <Button x:Name="MobileNavButton"
+                        Grid.Column="1"
+                        Text="☰"
+                        FontSize="22"
+                        TextColor="#293F35"
+                        BackgroundColor="Transparent"
+                        Padding="8,4"
+                        IsVisible="False"
+                        Clicked="OnMobileNavigationClicked"
+                        SemanticProperties.Description="Abrir navegação" />
+                <Grid x:Name="ProfileGrid"
+                      Grid.Column="2"
+                      ColumnDefinitions="32,*"
+                      ColumnSpacing="10"
+                      VerticalOptions="Center">
+                    <Border WidthRequest="32"
+                            HeightRequest="32"
+                            BackgroundColor="#EBEFE6"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 16">
+                        <Label x:Name="ProfileInitialsLabel"
+                               Text="?"
+                               FontFamily="Inter"
+                               FontAttributes="Bold"
+                               FontSize="9"
+                               TextColor="#293F35"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center" />
+                    </Border>
+                    <VerticalStackLayout x:Name="ProfileDetails"
+                                         Grid.Column="1"
+                                         Spacing="1"
+                                         VerticalOptions="Center">
+                    <Label x:Name="ProfileNameLabel"
+                           Text="Usuário"
+                           FontFamily="Inter"
+                           FontSize="11"
+                           TextColor="#242B28" />
+                    <Label x:Name="ProfileRoleLabel"
+                           Text="Funcionário"
+                           FontFamily="Inter"
+                           FontSize="9"
+                           TextColor="#727871" />
+                    </VerticalStackLayout>
+                    <Button Grid.ColumnSpan="2"
+                            BackgroundColor="Transparent"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            Clicked="OnProfileClicked"
+                            SemanticProperties.Description="Abrir opções do usuário e sair"
+                            ZIndex="1" />
+                </Grid>
+            </Grid>
+            <BoxView Grid.Row="0"
+                     HeightRequest="1"
+                     VerticalOptions="End"
+                     Color="#D7DBD2" />
+
+            <ScrollView Grid.Row="1">
+                <ContentView x:Name="BodyHost"
+                             Padding="24,20"
+                             HorizontalOptions="Center"
+                             MaximumWidthRequest="1440" />
+            </ScrollView>
+        </Grid>
+    </Grid>
+</ContentView>
