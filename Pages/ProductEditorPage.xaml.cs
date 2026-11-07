@@ -12,6 +12,21 @@ public partial class ProductEditorPage : ContentPage
         InitializeComponent();
     }
 
+    /// <summary>
+    /// Abre o editor preenchido com os dados de um produto existente.
+    /// </summary>
+    public ProductEditorPage(ProductRecord product) : this()
+    {
+        TitleLabel.Text = "Editar produto";
+        SubtitleLabel.Text = "Altere as informações, o preço ou corrija o estoque.";
+        StockLabel.Text = "Estoque atual";
+        NameEntry.Text = product.Name;
+        CodeEntry.Text = product.Code;
+        CategoryEntry.Text = product.Category;
+        PriceEntry.Text = product.Price.ToString("0.00", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
+        StockEntry.Text = product.Stock.ToString();
+    }
+
     public Task<ProductInput?> Completion => _completion.Task;
 
     private async void OnSaveClicked(object? sender, EventArgs e)

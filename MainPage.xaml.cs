@@ -37,15 +37,11 @@ namespace lojavendas
 
         private void OnPageSizeChanged(object? sender, EventArgs e)
         {
-            if (Width <= 0 || Height <= 0)
+            if (Width <= 0)
                 return;
 
-            FormContainer.WidthRequest = Math.Min(520, Math.Max(0, Width - 48));
-            FormContainer.Margin = new Thickness(
-                0,
-                Math.Clamp((Height - 626) / 2, 24, 167),
-                0,
-                0);
+            var isCompact = Width < 520;
+            TitleLabel.FontSize = isCompact ? 32 : 44;
         }
 
         private void OnTogglePasswordVisibility(object? sender, EventArgs e)
@@ -112,8 +108,8 @@ namespace lojavendas
                         appShell.UpdateWorkspaceAccess();
 
                     var destination = _authenticationService.CurrentEmployee?.Role == EmployeeRoles.Seller
-                        ? "//workspace/main/checkout"
-                        : "//workspace/main/sales";
+                        ? AppRoutes.Checkout
+                        : AppRoutes.Sales;
                     await Shell.Current.GoToAsync(destination);
                 }
                 catch (Exception exception)

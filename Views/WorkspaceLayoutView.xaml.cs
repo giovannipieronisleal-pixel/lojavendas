@@ -1,3 +1,5 @@
+using lojavendas.Models;
+
 namespace lojavendas.Views;
 
 public partial class WorkspaceLayoutView : ContentView
@@ -46,6 +48,7 @@ public partial class WorkspaceLayoutView : ContentView
     public WorkspaceLayoutView()
     {
         InitializeComponent();
+        MobileSidebar.ItemSelected += (_, _) => MobileDrawerOverlay.IsVisible = false;
         Loaded += OnLoaded;
         Unloaded += OnUnloaded;
         UpdateProfile();
@@ -70,6 +73,10 @@ public partial class WorkspaceLayoutView : ContentView
                 .Take(2)
                 .Select(part => char.ToUpperInvariant(part[0])));
         ProfileInitialsLabel.Text = initials;
+
+        Sidebar.UpdateSelection();
+        MobileSidebar.UpdateSelection();
+        UpdateResponsiveLayout();
     }
 
     private void OnLoaded(object? sender, EventArgs e)
@@ -88,32 +95,47 @@ public partial class WorkspaceLayoutView : ContentView
             shell.Navigated -= OnShellNavigated;
     }
 
-    private void OnShellNavigated(object? sender, ShellNavigatedEventArgs e) =>
-        UpdateProfile();
-
-    private void OnLayoutSizeChanged(object? sender, EventArgs e)
+    private void OnShellNavigated(object? sender, ShellNavigatedEventArgs e)
     {
-        var isCompact = Width < 820;
-        var isSeller = (Shell.Current as AppShell)?.CurrentEmployee?.Role == lojavendas.Models.EmployeeRoles.Seller;
-        var showSidebar = !isCompact && !isSeller;
-        LayoutGrid.ColumnDefinitions[0].Width = showSidebar ? new GridLength(232) : new GridLength(0);
-        Sidebar.IsVisible = showSidebar;
+        MobileDrawerOverlay.IsVisible = false;
+        UpdateProfile();
+    }
+
+    private void OnLayoutSizeChanged(object? sender, EventArgs e) =>
+        UpdateResponsiveLayout();
+
+    private void UpdateResponsiveLayout()
+    {
+        if (Width <= 0)
+            return;
+
+        var isCompact = Width < 860;
+        var isSeller = (Shell.Current as AppShell)?.CurrentEmployee?.Role == EmployeeRoles.Seller;
+        var showFixedSidebar = !isCompact && !isSeller;
+
+        LayoutGrid.ColumnDefinitions[0].Width = showFixedSidebar ? new GridLength(240) : new GridLength(0);
+        Sidebar.IsVisible = showFixedSidebar;
         MobileNavButton.IsVisible = isCompact && !isSeller;
+        if (!isCompact || isSeller)
+            MobileDrawerOverlay.IsVisible = false;
+
+        AreaLabel.IsVisible = !isCompact;
+        BreadcrumbSeparator.IsVisible = !isCompact;
         ProfileDetails.IsVisible = !isCompact;
         HeaderGrid.Padding = isCompact ? new Thickness(12, 0) : new Thickness(24, 0);
-        BodyHost.Padding = isCompact ? new Thickness(16, 16) : new Thickness(24, 20);
-        ContentGrid.RowDefinitions[0].Height = isCompact ? 64 : 80;
+        BodyHost.Padding = isCompact ? new Thickness(14, 14, 14, 28) : new Thickness(28, 22, 28, 32);
+        ContentGrid.RowDefinitions[0].Height = isCompact ? 56 : 68;
     }
 
     private async void OnProfileClicked(object? sender, EventArgs e)
     {
         UpdateProfile();
         var action = await Shell.Current.DisplayActionSheetAsync(
-            ProfileNameLabel.Text,
+            $"{ProfileNameLabel.Text} ({ProfileRoleLabel.Text})",
             "Cancelar",
             null,
-            "Sair");
-        if (action != "Sair")
+            "Sair da conta");
+        if (action != "Sair da conta")
             return;
 
         var shouldSignOut = await Shell.Current.DisplayAlertAsync(
@@ -125,43 +147,23 @@ public partial class WorkspaceLayoutView : ContentView
             await shell.SignOutAsync();
     }
 
-    private async void OnMobileNavigationClicked(object? sender, EventArgs e)
+    private void OnMobileNavigationClicked(object? sender, EventArgs e)
     {
-        var employee = (Shell.Current as AppShell)?.CurrentEmployee;
-        if (employee is null)
-            return;
-
-        var options = new List<(string Label, string Route)>
-        {
-            ("Vendas", employee.Role == lojavendas.Models.EmployeeRoles.Seller
-                ? "//workspace/main/checkout"
-                : "//workspace/main/sales"),
-            ("Caixa", "//workspace/main/checkout")
-        };
-        if (employee.Role != lojavendas.Models.EmployeeRoles.Seller)
-            options.Add(("Devedores", "//workspace/main/debts"));
-        if (employee.Role == lojavendas.Models.EmployeeRoles.Administration)
-        {
-            options.Add(("Funcionários", "//workspace/main/employees"));
-            options.Add(("Produtos", "//workspace/main/products"));
-            options.Add(("Análise de vendas", "//workspace/main/analytics"));
-        }
-
-        var selected = await Shell.Current.DisplayActionSheetAsync(
-            "Navegar",
-            "Cancelar",
-            null,
-            options.Select(option => option.Label).ToArray());
-        var destination = options.FirstOrDefault(option => option.Label == selected);
-        if (destination.Route is not null)
-            await Shell.Current.GoToAsync(destination.Route);
+        MobileSidebar.UpdateSelection();
+        MobileDrawerOverlay.IsVisible = !MobileDrawerOverlay.IsVisible;
     }
+
+    private void OnDrawerBackdropTapped(object? sender, TappedEventArgs e) =>
+        MobileDrawerOverlay.IsVisible = false;
 
     private static void OnActiveRouteChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var layout = (WorkspaceLayoutView)bindable;
+        var route = (string)newValue;
         if (layout.Sidebar is not null)
-            layout.Sidebar.ActiveRoute = (string)newValue;
+            layout.Sidebar.ActiveRoute = route;
+        if (layout.MobileSidebar is not null)
+            layout.MobileSidebar.ActiveRoute = route;
     }
 
     private static void OnBreadcrumbChanged(BindableObject bindable, object oldValue, object newValue)

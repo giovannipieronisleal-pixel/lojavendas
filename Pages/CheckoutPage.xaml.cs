@@ -74,7 +74,7 @@ public partial class CheckoutPage : ContentPage
         var employee = _authenticationService.CurrentEmployee;
         if (employee is null || !employee.IsActive)
         {
-            await Shell.Current.GoToAsync("//login/main/form");
+            await Shell.Current.GoToAsync(AppRoutes.Login);
             return;
         }
 
@@ -109,10 +109,10 @@ public partial class CheckoutPage : ContentPage
         value.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
 
     private async void OnBackToSalesClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/sales");
+        await Shell.Current.GoToAsync(AppRoutes.Sales);
 
     private async void OnDebtorsClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/debts");
+        await Shell.Current.GoToAsync(AppRoutes.Debtors);
 
     private void OnProductSearchTextChanged(object? sender, TextChangedEventArgs e)
     {
@@ -131,9 +131,9 @@ public partial class CheckoutPage : ContentPage
     private void OnProductSearchClicked(object? sender, EventArgs e) =>
         SelectSearchResult();
 
-    private void OnProductSelected(object? sender, SelectionChangedEventArgs e)
+    private void OnSearchResultTapped(object? sender, TappedEventArgs e)
     {
-        if (e.CurrentSelection.FirstOrDefault() is ProductRecord product)
+        if (sender is BindableObject { BindingContext: ProductRecord product })
             SelectProduct(product);
     }
 
@@ -185,7 +185,6 @@ public partial class CheckoutPage : ContentPage
         _isUpdatingSearchText = true;
         ProductSearchEntry.Text = $"{product.Name} · {product.Code}";
         _isUpdatingSearchText = false;
-        ProductSearchResults.SelectedItem = null;
         ProductSearchResults.IsVisible = false;
         NoProductsFoundLabel.IsVisible = false;
         CheckoutErrorLabel.IsVisible = false;
@@ -293,7 +292,7 @@ public partial class CheckoutPage : ContentPage
         if (employee is null || !employee.IsActive)
         {
             ShowCheckoutError("Sua sessão terminou. Entre novamente para registrar a venda.");
-            await Shell.Current.GoToAsync("//login/main/form");
+            await Shell.Current.GoToAsync(AppRoutes.Login);
             return;
         }
 
@@ -307,16 +306,10 @@ public partial class CheckoutPage : ContentPage
         var customerName = string.Empty;
         if (paymentMethod == "Pagar depois")
         {
-            customerName = await DisplayPromptAsync(
-                "Identificar cliente",
-                "Informe o nome da pessoa responsável pela dívida:",
-                "Continuar",
-                "Cancelar",
-                "Nome do cliente",
-                maxLength: 120,
-                keyboard: Keyboard.Text);
-            if (customerName is null)
+            var selectedName = await PickCustomerNameAsync();
+            if (selectedName is null)
                 return;
+            customerName = selectedName;
             if (string.IsNullOrWhiteSpace(customerName))
             {
                 ShowCheckoutError("Informe o nome do cliente para registrar a venda a prazo.");
@@ -355,7 +348,7 @@ public partial class CheckoutPage : ContentPage
             _cart.Clear();
             AmountReceivedEntry.Text = string.Empty;
             await RefreshProductsAsync();
-            await Shell.Current.GoToAsync("//workspace/main/sales");
+            await Shell.Current.GoToAsync(AppRoutes.Sales);
         }
         catch (ArgumentException exception)
         {
@@ -373,6 +366,47 @@ public partial class CheckoutPage : ContentPage
         }
     }
 
+    /// <summary>
+    /// Permite escolher um cliente que já tem conta (para somar a dívida) ou digitar um novo nome.
+    /// Retorna null se o usuário cancelar.
+    /// </summary>
+    private async Task<string?> PickCustomerNameAsync()
+    {
+        const string newCustomerOption = "＋ Novo cliente";
+        IReadOnlyList<string> existingNames = [];
+        try
+        {
+            existingNames = await _commerceService.GetCreditCustomerNamesAsync();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogWarning(exception, "Falha ao carregar clientes existentes; seguindo com digitação manual.");
+        }
+
+        if (existingNames.Count > 0)
+        {
+            var options = new[] { newCustomerOption }.Concat(existingNames).ToArray();
+            var choice = await DisplayActionSheetAsync(
+                "Adicionar na conta de qual cliente?",
+                "Cancelar",
+                null,
+                options);
+            if (choice is null || choice == "Cancelar")
+                return null;
+            if (choice != newCustomerOption)
+                return choice;
+        }
+
+        return await DisplayPromptAsync(
+            "Identificar cliente",
+            "Informe o nome da pessoa responsável pela dívida.\nSe o nome já existir, a venda será somada à conta dele.",
+            "Continuar",
+            "Cancelar",
+            "Nome do cliente",
+            maxLength: 120,
+            keyboard: Keyboard.Text);
+    }
+
     private async Task RefreshProductsAsync()
     {
         _availableProducts.Clear();
@@ -383,6 +417,7 @@ public partial class CheckoutPage : ContentPage
     private void UpdateTotals()
     {
         var quantity = _cart.Sum(line => line.Quantity);
+        EmptyCartLabel.IsVisible = _cart.Count == 0;
         CartCountLabel.Text = $"{quantity} {(quantity == 1 ? "item" : "itens")}";
         CartSummaryLabel.Text = CartCountLabel.Text;
         TotalLabel.Text = FormatCurrency(Total);

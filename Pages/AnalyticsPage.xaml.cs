@@ -4,7 +4,6 @@ using System.Text;
 using lojavendas.Models;
 using lojavendas.Services;
 using Microsoft.Extensions.Logging;
-using ScottPlot;
 
 namespace lojavendas.Pages;
 
@@ -186,16 +185,10 @@ public partial class AnalyticsPage : ContentPage
         UpdatedAtLabel.Text = $"Atualizado em {DateTime.Now:dd/MM/yyyy HH:mm}";
     }
 
-    private void OnRevenuePlotLoaded(object? sender, EventArgs e) =>
+    private void OnRevenueChartSizeChanged(object? sender, EventArgs e) =>
         RenderCurrentRevenueChart();
 
-    private void OnRevenuePlotSizeChanged(object? sender, EventArgs e) =>
-        RenderCurrentRevenueChart();
-
-    private void OnPaymentPlotLoaded(object? sender, EventArgs e) =>
-        RenderCurrentPaymentChart();
-
-    private void OnPaymentPlotSizeChanged(object? sender, EventArgs e) =>
+    private void OnPaymentChartSizeChanged(object? sender, EventArgs e) =>
         RenderCurrentPaymentChart();
 
     private void RenderCurrentRevenueChart()
@@ -242,24 +235,9 @@ public partial class AnalyticsPage : ContentPage
                 dailyRevenue[day] += payment.Amount;
         }
 
-        var xs = Enumerable.Range(0, dayCount).Select(index => (double)index).ToArray();
-        var ys = dailyRevenue.Select(amount => (double)amount).ToArray();
-        RevenuePlot.Plot.Clear();
-        var revenueLine = RevenuePlot.Plot.Add.Scatter(xs, ys);
-        revenueLine.LineWidth = 2;
-        revenueLine.MarkerSize = 6;
-
-        var tickCount = Math.Min(6, dayCount);
-        var tickIndexes = Enumerable.Range(0, tickCount)
-            .Select(index => tickCount == 1 ? 0 : (int)Math.Round(index * (dayCount - 1d) / (tickCount - 1)))
-            .Distinct()
-            .ToArray();
-        RevenuePlot.Plot.Axes.Bottom.SetTicks(
-            tickIndexes.Select(index => (double)index).ToArray(),
-            tickIndexes.Select(index => start.AddDays(index).ToString("dd/MM")).ToArray());
-        RevenuePlot.Plot.Axes.AutoScale();
+        RevenueChart.Drawable = new RevenueChartDrawable(start, dailyRevenue);
         RevenueChartEmptyLabel.IsVisible = dailyRevenue.All(amount => amount == 0);
-        RevenuePlot.Refresh();
+        RevenueChart.Invalidate();
     }
 
     private void RenderPaymentChart(
@@ -270,29 +248,9 @@ public partial class AnalyticsPage : ContentPage
             .Where(item => item.Value > 0)
             .OrderByDescending(item => item.Value)
             .ToList();
-        PaymentPlot.Plot.Clear();
-        if (amountsByMethod.Count == 0)
-        {
-            PaymentPlot.Plot.Add.Bars([0]);
-            PaymentChartEmptyLabel.IsVisible = true;
-        }
-        else
-        {
-            PaymentChartEmptyLabel.IsVisible = false;
-            var bars = amountsByMethod.Select((item, index) => new Bar
-            {
-                Position = index + 1,
-                Value = (double)item.Value
-            }).ToArray();
-            var barPlot = PaymentPlot.Plot.Add.Bars(bars);
-            barPlot.Horizontal = true;
-            PaymentPlot.Plot.Axes.Left.SetTicks(
-                amountsByMethod.Select((_, index) => (double)index + 1).ToArray(),
-                amountsByMethod.Select(item => item.Key).ToArray());
-        }
-
-        PaymentPlot.Plot.Axes.AutoScale();
-        PaymentPlot.Refresh();
+        PaymentChart.Drawable = new PaymentChartDrawable(amountsByMethod);
+        PaymentChartEmptyLabel.IsVisible = amountsByMethod.Count == 0;
+        PaymentChart.Invalidate();
     }
 
     private void UpdateTopProducts(HashSet<int> periodSaleIds)
@@ -387,17 +345,13 @@ public partial class AnalyticsPage : ContentPage
         _chartPeriodSales = [];
         _chartDebtPayments = [];
 
-        RevenuePlot.Plot.Clear();
-        RevenuePlot.Plot.Add.Scatter(new double[] { 0, 1 }, new double[] { 0, 0 });
-        RevenuePlot.Plot.Axes.AutoScale();
+        RevenueChart.Drawable = new RevenueChartDrawable(_chartStart.Value, new decimal[1]);
         RevenueChartEmptyLabel.IsVisible = true;
-        RevenuePlot.Refresh();
+        RevenueChart.Invalidate();
 
-        PaymentPlot.Plot.Clear();
-        PaymentPlot.Plot.Add.Bars([0]);
-        PaymentPlot.Plot.Axes.AutoScale();
+        PaymentChart.Drawable = new PaymentChartDrawable([]);
         PaymentChartEmptyLabel.IsVisible = true;
-        PaymentPlot.Refresh();
+        PaymentChart.Invalidate();
     }
 
     private async Task RefreshBackupStatusAsync()

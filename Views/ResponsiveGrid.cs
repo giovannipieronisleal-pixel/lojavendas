@@ -7,14 +7,16 @@ public sealed class ResponsiveGrid : Grid
             nameof(MaximumColumns),
             typeof(int),
             typeof(ResponsiveGrid),
-            4);
+            4,
+            propertyChanged: OnLayoutParametersChanged);
 
     public static readonly BindableProperty MinimumColumnWidthProperty =
         BindableProperty.Create(
             nameof(MinimumColumnWidth),
             typeof(double),
             typeof(ResponsiveGrid),
-            220d);
+            220d,
+            propertyChanged: OnLayoutParametersChanged);
 
     private int _configuredColumns;
     private int _configuredChildren = -1;
@@ -31,9 +33,28 @@ public sealed class ResponsiveGrid : Grid
         set => SetValue(MinimumColumnWidthProperty, value);
     }
 
+    protected override void OnChildAdded(Element child)
+    {
+        base.OnChildAdded(child);
+        _configuredChildren = -1;
+        ArrangeForWidth(Width);
+    }
+
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
+        ArrangeForWidth(width);
+    }
+
+    private static void OnLayoutParametersChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var grid = (ResponsiveGrid)bindable;
+        grid._configuredColumns = 0;
+        grid.ArrangeForWidth(grid.Width);
+    }
+
+    private void ArrangeForWidth(double width)
+    {
         if (width <= 0 || Children.Count == 0 || MaximumColumns <= 0 || MinimumColumnWidth <= 0)
             return;
 
@@ -64,5 +85,7 @@ public sealed class ResponsiveGrid : Grid
             Grid.SetRow(child, index / columns);
             Grid.SetColumn(child, index % columns);
         }
+
+        InvalidateMeasure();
     }
 }

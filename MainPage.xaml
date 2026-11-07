@@ -5,34 +5,34 @@
              BackgroundColor="#F6F5F0"
              Shell.NavBarIsVisible="False"
              SizeChanged="OnPageSizeChanged">
-    <Grid Padding="24"
-          RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
+    <Grid RowDefinitions="*,Auto" Padding="24,16">
+        <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Never">
             <VerticalStackLayout x:Name="FormContainer"
-                                 WidthRequest="520"
-                                 MaximumWidthRequest="520"
-                                 HorizontalOptions="Center"
-                                 Spacing="40">
-                <Label Text="Acesso&#10;para funcionários."
-                       HeightRequest="118"
+                                 MaximumWidthRequest="480"
+                                 HorizontalOptions="Fill"
+                                 VerticalOptions="Center"
+                                 Padding="0,16"
+                                 Spacing="28">
+                <Label x:Name="TitleLabel"
+                       Text="Acesso&#10;para funcionários."
                        FontFamily="Inter"
                        FontAttributes="Bold"
-                       FontSize="52"
-                       LineHeight="1.13"
-                       CharacterSpacing="-0.03"
+                       FontSize="40"
+                       LineHeight="1.12"
+                       CharacterSpacing="-0.02"
                        TextColor="#242B28"
                        LineBreakMode="WordWrap"
                        SemanticProperties.HeadingLevel="Level1" />
 
-                <VerticalStackLayout Spacing="28">
-                    <VerticalStackLayout Spacing="10">
+                <VerticalStackLayout Spacing="20">
+                    <VerticalStackLayout Spacing="8">
                         <Label Text="Login"
                                FontFamily="Inter"
                                FontAttributes="Bold"
                                FontSize="14"
                                TextColor="#242B28" />
-                        <Border HeightRequest="64"
-                                Padding="16,0"
+                        <Border MinimumHeightRequest="56"
+                                Padding="14,4"
                                 BackgroundColor="White"
                                 Stroke="#D7DBD2"
                                 StrokeThickness="1"
@@ -43,24 +43,26 @@
                                    FontSize="16"
                                    TextColor="#242B28"
                                    PlaceholderColor="#9A9E96"
+                                   VerticalOptions="Center"
                                    ReturnType="Next"
                                    SemanticProperties.Description="Login" />
                         </Border>
                     </VerticalStackLayout>
 
-                    <VerticalStackLayout Spacing="10">
+                    <VerticalStackLayout Spacing="8">
                         <Label Text="Senha"
                                FontFamily="Inter"
                                FontAttributes="Bold"
                                FontSize="14"
                                TextColor="#242B28" />
-                        <Border HeightRequest="64"
-                                Padding="16,0"
+                        <Border MinimumHeightRequest="56"
+                                Padding="14,4"
                                 BackgroundColor="White"
                                 Stroke="#D7DBD2"
                                 StrokeThickness="1"
                                 StrokeShape="RoundRectangle 8">
-                            <Grid ColumnDefinitions="*,76"
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="8"
                                   VerticalOptions="Center">
                                 <Entry x:Name="PasswordEntry"
                                        Grid.Column="0"
@@ -70,37 +72,36 @@
                                        TextColor="#242B28"
                                        PlaceholderColor="#9A9E96"
                                        IsPassword="True"
+                                       VerticalOptions="Center"
                                        ReturnType="Go"
                                        Completed="OnPasswordCompleted"
                                        SemanticProperties.Description="Senha" />
-                                <Grid Grid.Column="1"
-                                      WidthRequest="44"
-                                      HeightRequest="44">
-                                    <Button x:Name="PasswordVisibilityButton"
-                                            Text="Mostrar"
-                                            BackgroundColor="Transparent"
-                                            BorderWidth="0"
-                                            Padding="0"
-                                            FontFamily="Inter"
-                                            FontAttributes="Bold"
-                                            FontSize="10"
-                                            TextColor="#293F35"
-                                            Clicked="OnTogglePasswordVisibility"
-                                            SemanticProperties.Description="Mostrar senha" />
-                                </Grid>
+                                <Button x:Name="PasswordVisibilityButton"
+                                        Grid.Column="1"
+                                        Text="Mostrar"
+                                        BackgroundColor="Transparent"
+                                        BorderWidth="0"
+                                        Padding="8,0"
+                                        MinimumWidthRequest="60"
+                                        FontFamily="Inter"
+                                        FontAttributes="Bold"
+                                        FontSize="12"
+                                        TextColor="#293F35"
+                                        Clicked="OnTogglePasswordVisibility"
+                                        SemanticProperties.Description="Mostrar senha" />
                             </Grid>
                         </Border>
                     </VerticalStackLayout>
 
-                    <Grid HeightRequest="64">
+                    <Grid HeightRequest="56" Margin="0,4,0,0">
                         <Button x:Name="AcessButton"
                                 Text="Acessar"
                                 BackgroundColor="#293F35"
                                 TextColor="#F3F4E9"
                                 FontFamily="Inter"
                                 FontAttributes="Bold"
-                                FontSize="17"
-                                ContentLayout="Left,24"
+                                FontSize="16"
+                                ContentLayout="Left,20"
                                 BorderWidth="0"
                                 CornerRadius="8"
                                 Clicked="OnAccessClicked"
@@ -109,7 +110,7 @@
                         <Image Source="arrow_right.svg"
                                WidthRequest="20"
                                HeightRequest="20"
-                               Margin="0,0,24,0"
+                               Margin="0,0,20,0"
                                HorizontalOptions="End"
                                VerticalOptions="Center"
                                InputTransparent="True" />
@@ -119,9 +120,9 @@
         </ScrollView>
 
         <HorizontalStackLayout Grid.Row="1"
-                               Margin="64,0,0,40"
+                               Margin="0,8,0,4"
                                Spacing="6"
-                               VerticalOptions="Start"
+                               HorizontalOptions="Center"
                                SemanticProperties.Description="Idioma: Português do Brasil">
             <Image Source="globe.svg"
                    WidthRequest="14"
@@ -129,13 +130,9 @@
                    VerticalOptions="Center" />
             <Label Text="Português (BR)"
                    FontFamily="Inter"
-                   FontSize="11"
+                   FontSize="12"
                    TextColor="#727871"
                    VerticalTextAlignment="Center" />
-            <Image Source="chevron_down.svg"
-                   WidthRequest="12"
-                   HeightRequest="12"
-                   VerticalOptions="Center" />
         </HorizontalStackLayout>
     </Grid>
 </ContentPage>

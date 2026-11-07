@@ -3,7 +3,10 @@
     x:Class="lojavendas.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    Title="lojavendas">
+    Title="lojavendas"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False"
+    FlyoutBehavior="Disabled">
 
     <ShellItem Route="login">
         <ShellSection Route="main">
@@ -11,33 +14,36 @@
         </ShellSection>
     </ShellItem>
 
+    <!--
+        Cada ShellContent fica em uma seção própria (implícita). Várias ShellContent dentro de uma
+        mesma ShellSection fazem o Android exibir uma barra de abas superior que ocupa espaço da tela.
+        A navegação entre as páginas é feita pela barra lateral / menu do próprio app.
+    -->
     <ShellItem Route="workspace" Shell.TabBarIsVisible="False">
-        <ShellSection Route="main" Shell.TabBarIsVisible="False">
-            <ShellContent
-                x:Name="SalesShellContent"
-                Route="sales"
-                Title="Vendas" />
-            <ShellContent
-                x:Name="EmployeesShellContent"
-                Route="employees"
-                Title="Funcionários" />
-            <ShellContent
-                x:Name="ProductsShellContent"
-                Route="products"
-                Title="Produtos" />
-            <ShellContent
-                x:Name="AnalyticsShellContent"
-                Route="analytics"
-                Title="Análise de vendas" />
-            <ShellContent
-                x:Name="CheckoutShellContent"
-                Route="checkout"
-                Title="Caixa" />
-            <ShellContent
-                x:Name="DebtorsShellContent"
-                Route="debts"
-                Title="Devedores" />
-        </ShellSection>
+        <ShellContent
+            x:Name="SalesShellContent"
+            Route="sales"
+            Title="Vendas" />
+        <ShellContent
+            x:Name="EmployeesShellContent"
+            Route="employees"
+            Title="Funcionários" />
+        <ShellContent
+            x:Name="ProductsShellContent"
+            Route="products"
+            Title="Produtos" />
+        <ShellContent
+            x:Name="AnalyticsShellContent"
+            Route="analytics"
+            Title="Análise de vendas" />
+        <ShellContent
+            x:Name="CheckoutShellContent"
+            Route="checkout"
+            Title="Caixa" />
+        <ShellContent
+            x:Name="DebtorsShellContent"
+            Route="debts"
+            Title="Devedores" />
     </ShellItem>
 
 </Shell>

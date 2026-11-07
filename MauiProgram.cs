@@ -1,7 +1,6 @@
 using lojavendas.Services;
 using lojavendas.Pages;
 using Microsoft.Extensions.Logging;
-using ScottPlot.Maui;
 
 namespace lojavendas
 {
@@ -12,7 +11,6 @@ namespace lojavendas
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-                .UseScottPlot()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

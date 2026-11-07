@@ -4,47 +4,50 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     BackgroundColor="#66000000">
-    <Grid Padding="24">
-        <ScrollView VerticalOptions="Fill">
-            <Border MaximumWidthRequest="520"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    Margin="0,8"
-                    Padding="24"
-                    BackgroundColor="#F6F5F0"
-                    Stroke="#D7DBD2"
-                    StrokeShape="RoundRectangle 14">
-                <VerticalStackLayout Spacing="12">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <VerticalStackLayout Spacing="4">
-                            <Label Text="Novo produto" FontFamily="Inter" FontSize="20" TextColor="#242B28" />
-                            <Label Text="Cadastre as informações e o estoque inicial." FontFamily="Inter" FontSize="10" TextColor="#727871" />
-                        </VerticalStackLayout>
-                        <Button Grid.Column="1" Text="✕" BackgroundColor="Transparent" TextColor="#727871" Padding="8,2" Clicked="OnCancelClicked" />
-                    </Grid>
-                    <Label Text="Nome do produto" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                    <Entry x:Name="NameEntry" Placeholder="Ex.: Headphone sem fio" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
-                    <Label Text="Código / SKU" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                    <Entry x:Name="CodeEntry" Placeholder="Ex.: TEC-001" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
-                    <Label Text="Categoria" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                    <Entry x:Name="CategoryEntry" Placeholder="Ex.: Tecnologia" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                        <VerticalStackLayout Spacing="6">
-                            <Label Text="Preço de venda (R$)" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                            <Entry x:Name="PriceEntry" Placeholder="0,00" Keyboard="Numeric" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
-                        </VerticalStackLayout>
-                        <VerticalStackLayout Grid.Column="1" Spacing="6">
-                            <Label Text="Estoque inicial" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                            <Entry x:Name="StockEntry" Placeholder="0" Keyboard="Numeric" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
-                        </VerticalStackLayout>
-                    </Grid>
-                    <Label x:Name="ErrorLabel" IsVisible="False" FontFamily="Inter" FontSize="10" TextColor="#B84F42" />
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                        <Button Text="Cancelar" BackgroundColor="White" TextColor="#293F35" BorderColor="#D7DBD2" BorderWidth="1" Clicked="OnCancelClicked" />
-                        <Button Grid.Column="1" Text="Salvar produto" BackgroundColor="#293F35" TextColor="White" Clicked="OnSaveClicked" />
-                    </Grid>
+    <ScrollView Padding="16">
+        <Border MaximumWidthRequest="520"
+                HorizontalOptions="Fill"
+                VerticalOptions="Center"
+                Padding="20"
+                BackgroundColor="#F6F5F0"
+                Stroke="#D7DBD2"
+                StrokeShape="RoundRectangle 14">
+            <VerticalStackLayout Spacing="12">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <VerticalStackLayout Spacing="4">
+                        <Label x:Name="TitleLabel" Text="Novo produto" FontFamily="Inter" FontSize="20" TextColor="#242B28" />
+                        <Label x:Name="SubtitleLabel" Text="Cadastre as informações e o estoque inicial." FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="1" Text="✕" BackgroundColor="Transparent" TextColor="#727871" Padding="8,2" Clicked="OnCancelClicked" />
+                </Grid>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Nome do produto" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                    <Entry x:Name="NameEntry" Placeholder="Ex.: Headphone sem fio" FontFamily="Inter" FontSize="14" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
                 </VerticalStackLayout>
-            </Border>
-        </ScrollView>
-    </Grid>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Código / SKU" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                    <Entry x:Name="CodeEntry" Placeholder="Ex.: TEC-001" FontFamily="Inter" FontSize="14" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Categoria" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                    <Entry x:Name="CategoryEntry" Placeholder="Ex.: Tecnologia" FontFamily="Inter" FontSize="14" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
+                </VerticalStackLayout>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Preço de venda (R$)" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                        <Entry x:Name="PriceEntry" Placeholder="0,00" Keyboard="Numeric" FontFamily="Inter" FontSize="14" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="6">
+                        <Label x:Name="StockLabel" Text="Estoque inicial" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                        <Entry x:Name="StockEntry" Placeholder="0" Keyboard="Numeric" FontFamily="Inter" FontSize="14" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
+                    </VerticalStackLayout>
+                </Grid>
+                <Label x:Name="ErrorLabel" IsVisible="False" FontFamily="Inter" FontSize="12" TextColor="#B84F42" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,4,0,0">
+                    <Button Text="Cancelar" BackgroundColor="White" TextColor="#293F35" BorderColor="#D7DBD2" BorderWidth="1" FontFamily="Inter" FontSize="13" Clicked="OnCancelClicked" />
+                    <Button Grid.Column="1" Text="Salvar produto" BackgroundColor="#293F35" TextColor="White" FontFamily="Inter" FontSize="13" Clicked="OnSaveClicked" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+    </ScrollView>
 </ContentPage>

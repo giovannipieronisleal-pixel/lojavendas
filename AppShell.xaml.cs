@@ -1,4 +1,4 @@
-using lojavendas.Models;
+﻿using lojavendas.Models;
 using lojavendas.Pages;
 using lojavendas.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,14 +40,14 @@ namespace lojavendas
 
         public string GetLandingRoute() =>
             CurrentEmployee?.Role == EmployeeRoles.Seller
-                ? "//workspace/main/checkout"
-                : "//workspace/main/sales";
+                ? AppRoutes.Checkout
+                : AppRoutes.Sales;
 
         public async Task SignOutAsync()
         {
             _authenticationService.SignOut();
             UpdateWorkspaceAccess();
-            await GoToAsync("//login/main/form");
+            await GoToAsync(AppRoutes.Login);
         }
 
         public void UpdateWorkspaceAccess()
@@ -94,7 +94,7 @@ namespace lojavendas
                 try
                 {
                     if (CurrentEmployee is null)
-                        await GoToAsync("//login/main/form");
+                        await GoToAsync(AppRoutes.Login);
                     else
                         await GoToAsync(GetLandingRoute());
                 }

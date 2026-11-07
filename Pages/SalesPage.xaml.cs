@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using lojavendas.Models;
 using lojavendas.Services;
 using Microsoft.Extensions.Logging;
@@ -50,8 +50,8 @@ public partial class SalesPage : ContentPage
     }
 
     private async void OnRegisterSaleClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/checkout");
+        await Shell.Current.GoToAsync(AppRoutes.Checkout);
 
     private async void OnDebtorsClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/debts");
+        await Shell.Current.GoToAsync(AppRoutes.Debtors);
 }

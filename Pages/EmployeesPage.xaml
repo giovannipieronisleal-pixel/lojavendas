@@ -10,20 +10,21 @@
     <views:WorkspaceLayoutView ActiveRoute="employees" Breadcrumb="Funcionários">
         <views:WorkspaceLayoutView.Body>
             <VerticalStackLayout Spacing="20">
-                <Grid ColumnDefinitions="*,Auto">
+                <views:ResponsiveGrid MaximumColumns="2" MinimumColumnWidth="240" ColumnSpacing="12" RowSpacing="10">
                     <VerticalStackLayout Spacing="4">
-                        <Label Text="Funcionários" FontFamily="Inter" FontSize="28" TextColor="#242B28" />
-                        <Label Text="Gerencie acessos, cargos, equipes e status." FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                        <Label Text="Funcionários" FontFamily="Inter" FontSize="26" TextColor="#242B28" />
+                        <Label Text="Gerencie acessos, cargos, equipes e status." FontFamily="Inter" FontSize="13" TextColor="#727871" />
                     </VerticalStackLayout>
-                    <Button Grid.Column="1"
-                            Text="＋  Criar funcionário"
+                    <Button Text="＋  Criar funcionário"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center"
                             BackgroundColor="#293F35"
                             TextColor="White"
                             FontFamily="Inter"
-                            FontSize="12"
+                            FontSize="13"
                             Padding="16,10"
                             Clicked="OnNewEmployeeClicked" />
-                </Grid>
+                </views:ResponsiveGrid>
 
                 <views:ResponsiveGrid MaximumColumns="3" MinimumColumnWidth="230" ColumnSpacing="12" RowSpacing="12">
                     <Border Padding="18" BackgroundColor="#293F35" StrokeThickness="0" StrokeShape="RoundRectangle 10">

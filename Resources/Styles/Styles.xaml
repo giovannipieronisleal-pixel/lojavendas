@@ -402,7 +402,18 @@
 
     <Style TargetType="Page" ApplyToDerivedTypes="True">
         <Setter Property="Padding" Value="0"/>
-        <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource OffBlack}}" />
+        <Setter Property="BackgroundColor" Value="#F6F5F0" />
+    </Style>
+
+    <!--
+        No .NET 10 o Android desenha o app "de ponta a ponta" (atrás da barra de status e da barra de
+        navegação). "All" mantém o conteúdo fora dessas barras e também sobe a tela quando o teclado abre,
+        evitando campos e botões cortados.
+    -->
+    <Style TargetType="ContentPage" ApplyToDerivedTypes="True">
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="BackgroundColor" Value="#F6F5F0" />
+        <Setter Property="SafeAreaEdges" Value="All" />
     </Style>
 
     <Style TargetType="Shell" ApplyToDerivedTypes="True">

@@ -1,3 +1,5 @@
+using lojavendas.Models;
+
 namespace lojavendas.Views;
 
 public partial class SidebarView : ContentView
@@ -16,10 +18,13 @@ public partial class SidebarView : ContentView
         set => SetValue(ActiveRouteProperty, value);
     }
 
+    /// <summary>Disparado quando um item do menu é tocado (usado para fechar o menu no celular).</summary>
+    public event EventHandler? ItemSelected;
+
     public SidebarView()
     {
         InitializeComponent();
-        StoreNameButton.Text = Preferences.Default.Get("storeName", "Loja Centro");
+        StoreNameLabel.Text = Preferences.Default.Get("storeName", "Loja Centro");
         UpdateSelection();
     }
 
@@ -28,13 +33,19 @@ public partial class SidebarView : ContentView
         ((SidebarView)bindable).UpdateSelection();
     }
 
-    private void UpdateSelection()
+    public void UpdateSelection()
     {
         var employee = (Shell.Current as AppShell)?.CurrentEmployee;
-        var isAdministrator = employee?.Role == lojavendas.Models.EmployeeRoles.Administration;
+        var role = employee?.Role;
+        var isAdministrator = role == EmployeeRoles.Administration;
+        var canSeeSales = role is EmployeeRoles.Administration or EmployeeRoles.Manager;
+
         EmployeesNav.IsVisible = isAdministrator;
         ProductsNav.IsVisible = isAdministrator;
         AnalyticsNav.IsVisible = isAdministrator;
+        DebtorsNav.IsVisible = canSeeSales;
+        CheckoutNav.IsVisible = employee is not null;
+        StoreNameLabel.Text = Preferences.Default.Get("storeName", "Loja Centro");
 
         var assetSet = ActiveRoute is "employees" ? "employees"
             : ActiveRoute is "products" ? "products"
@@ -47,6 +58,8 @@ public partial class SidebarView : ContentView
         SetItem(SalesBackground, SalesIcon, SalesLabel, "sales", assetSet, ActiveRoute is "sales" or "checkout" or "debts", selectedColor, normalColor);
         SetItem(ProductsBackground, ProductsIcon, ProductsLabel, "products", assetSet, ActiveRoute == "products", selectedColor, normalColor);
         SetItem(AnalyticsBackground, AnalyticsIcon, AnalyticsLabel, "analytics", assetSet, ActiveRoute == "analytics", selectedColor, normalColor);
+        SetSubItem(CheckoutBackground, CheckoutLabel, ActiveRoute == "checkout");
+        SetSubItem(DebtorsBackground, DebtorsLabel, ActiveRoute == "debts");
     }
 
     private static void SetItem(
@@ -65,26 +78,45 @@ public partial class SidebarView : ContentView
         label.TextColor = isSelected ? Color.FromArgb("#293F35") : Color.FromArgb("#F3F4E9");
     }
 
-    private async void OnEmployeesClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/employees");
-
-    private async void OnSalesClicked(object? sender, EventArgs e)
+    private static void SetSubItem(Border background, Label label, bool isSelected)
     {
-        var route = (Shell.Current as AppShell)?.CurrentEmployee?.Role == lojavendas.Models.EmployeeRoles.Seller
-            ? "//workspace/main/checkout"
-            : "//workspace/main/sales";
+        background.BackgroundColor = isSelected ? Color.FromArgb("#3A5348") : Colors.Transparent;
+        label.TextColor = isSelected ? Colors.White : Color.FromArgb("#D7DBD2");
+        label.FontAttributes = isSelected ? FontAttributes.Bold : FontAttributes.None;
+    }
+
+    private async Task NavigateAsync(string route)
+    {
+        ItemSelected?.Invoke(this, EventArgs.Empty);
         await Shell.Current.GoToAsync(route);
     }
 
+    private async void OnEmployeesClicked(object? sender, EventArgs e) =>
+        await NavigateAsync(AppRoutes.Employees);
+
+    private async void OnSalesClicked(object? sender, EventArgs e)
+    {
+        var route = (Shell.Current as AppShell)?.CurrentEmployee?.Role == EmployeeRoles.Seller
+            ? AppRoutes.Checkout
+            : AppRoutes.Sales;
+        await NavigateAsync(route);
+    }
+
+    private async void OnCheckoutClicked(object? sender, EventArgs e) =>
+        await NavigateAsync(AppRoutes.Checkout);
+
+    private async void OnDebtorsClicked(object? sender, EventArgs e) =>
+        await NavigateAsync(AppRoutes.Debtors);
+
     private async void OnProductsClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/products");
+        await NavigateAsync(AppRoutes.Products);
 
     private async void OnAnalyticsClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/analytics");
+        await NavigateAsync(AppRoutes.Analytics);
 
     private async void OnStoreNameClicked(object? sender, EventArgs e)
     {
-        var currentName = StoreNameButton.Text;
+        var currentName = StoreNameLabel.Text;
         var newName = await Shell.Current.DisplayPromptAsync(
             "Nome da loja",
             "Digite o nome que será exibido no menu.",
@@ -104,6 +136,6 @@ public partial class SidebarView : ContentView
         }
 
         Preferences.Default.Set("storeName", newName);
-        StoreNameButton.Text = newName;
+        StoreNameLabel.Text = newName;
     }
 }

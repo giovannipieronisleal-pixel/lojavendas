@@ -8,7 +8,7 @@
     xmlns:views="clr-namespace:lojavendas.Views"
     Shell.NavBarIsVisible="False"
     Shell.TabBarIsVisible="False">
-    <views:WorkspaceLayoutView ActiveRoute="checkout" Breadcrumb="Vendas">
+    <views:WorkspaceLayoutView ActiveRoute="checkout" Breadcrumb="Caixa">
         <views:WorkspaceLayoutView.Body>
             <VerticalStackLayout Spacing="16">
                 <Button x:Name="BackToSalesButton"
@@ -17,43 +17,45 @@
                         BackgroundColor="Transparent"
                         TextColor="#727871"
                         FontFamily="Inter"
-                        FontSize="11"
-                        Padding="0"
+                        FontSize="13"
+                        Padding="0,4"
                         Clicked="OnBackToSalesClicked" />
-                <Grid ColumnDefinitions="*,Auto">
-                    <Label Text="Caixa aberto" FontFamily="Inter" FontSize="28" TextColor="#242B28" />
-                    <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="End">
-                        <Label Text="● Caixa aberto" FontFamily="Inter" FontSize="10" TextColor="#416349" HorizontalTextAlignment="End" />
-                        <Label x:Name="SellerLabel" Text="Venda local" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Label Text="Caixa aberto" FontFamily="Inter" FontSize="26" TextColor="#242B28" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End" VerticalOptions="Center">
+                        <Label Text="● Caixa aberto" FontFamily="Inter" FontSize="11" TextColor="#416349" HorizontalTextAlignment="End" />
+                        <Label x:Name="SellerLabel" Text="Venda local" FontFamily="Inter" FontSize="11" TextColor="#727871" HorizontalTextAlignment="End" />
                     </VerticalStackLayout>
                 </Grid>
-                <HorizontalStackLayout Spacing="20" Padding="4,0,0,12">
-                    <Button Text="🛒  Caixa" BackgroundColor="Transparent" TextColor="#293F35" FontFamily="Inter" FontSize="12" Padding="0,6" />
-                    <Button x:Name="DebtorsTabButton" Text="◷  Devedores" BackgroundColor="Transparent" TextColor="#727871" FontFamily="Inter" FontSize="12" Padding="0,6" Clicked="OnDebtorsClicked" />
+                <HorizontalStackLayout Spacing="16">
+                    <Button Text="🛒  Caixa" BackgroundColor="#EBEFE6" TextColor="#293F35" FontFamily="Inter" FontSize="13" Padding="12,8" />
+                    <Button x:Name="DebtorsTabButton" Text="◷  Devedores" BackgroundColor="White" TextColor="#727871" BorderColor="#D7DBD2" BorderWidth="1" FontFamily="Inter" FontSize="13" Padding="12,8" Clicked="OnDebtorsClicked" />
                 </HorizontalStackLayout>
-                <views:ResponsiveGrid MaximumColumns="2" MinimumColumnWidth="360" ColumnSpacing="16" RowSpacing="14">
+
+                <views:ResponsiveGrid MaximumColumns="2" MinimumColumnWidth="300" ColumnSpacing="16" RowSpacing="16">
                     <VerticalStackLayout Spacing="14">
-                        <Border Padding="18" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                        <Border Padding="16" BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
                             <VerticalStackLayout Spacing="12">
-                                <Label Text="Adicionar produto" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
-                                <Label Text="Código de barras ou nome do produto" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                                <Border HeightRequest="50"
-                                        Padding="14,0"
+                                <Label Text="Adicionar produto" FontFamily="Inter" FontSize="16" FontAttributes="Bold" TextColor="#242B28" />
+                                <Label Text="Código ou nome do produto" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                <Border MinimumHeightRequest="48"
+                                        Padding="12,2"
                                         BackgroundColor="White"
                                         Stroke="#D7DBD2"
                                         StrokeShape="RoundRectangle 8">
-                                    <Grid ColumnDefinitions="28,*,40" ColumnSpacing="8">
+                                    <Grid ColumnDefinitions="24,*,40" ColumnSpacing="8" VerticalOptions="Center">
                                         <Image Source="icon_barcode.svg"
-                                               WidthRequest="22"
-                                               HeightRequest="22"
+                                               WidthRequest="20"
+                                               HeightRequest="20"
                                                VerticalOptions="Center" />
                                         <Entry x:Name="ProductSearchEntry"
                                                Grid.Column="1"
-                                               Placeholder="Leia o código ou digite o produto"
+                                               Placeholder="Digite o nome ou código"
                                                FontFamily="Inter"
-                                               FontSize="12"
+                                               FontSize="14"
                                                TextColor="#242B28"
                                                PlaceholderColor="#727871"
+                                               VerticalOptions="Center"
                                                ReturnType="Search"
                                                TextChanged="OnProductSearchTextChanged"
                                                Completed="OnProductSearchCompleted" />
@@ -63,58 +65,74 @@
                                                 BackgroundColor="Transparent"
                                                 TextColor="#293F35"
                                                 Padding="0"
+                                                MinimumWidthRequest="38"
+                                                MinimumHeightRequest="38"
                                                 Clicked="OnProductSearchClicked"
                                                 SemanticProperties.Description="Pesquisar produtos" />
                                     </Grid>
                                 </Border>
-                                <CollectionView x:Name="ProductSearchResults"
-                                                ItemsSource="{Binding SearchResults}"
-                                                SelectionMode="Single"
-                                                SelectionChanged="OnProductSelected"
-                                                HeightRequest="160"
-                                                IsVisible="False">
-                                    <CollectionView.ItemTemplate>
-                                        <DataTemplate x:DataType="models:ProductRecord">
-                                            <Grid Padding="12,8" ColumnDefinitions="*,Auto">
-                                                <VerticalStackLayout Spacing="2">
-                                                    <Label Text="{Binding Name}" FontFamily="Inter" FontSize="11" TextColor="#242B28" />
-                                                    <Label Text="{Binding Code}" FontFamily="Inter" FontSize="9" TextColor="#727871" />
+
+                                <!-- Resultados da busca sem CollectionView aninhado dentro do ScrollView -->
+                                <Border x:Name="ProductSearchResults"
+                                        IsVisible="False"
+                                        BackgroundColor="#F6F5F0"
+                                        Stroke="#E4E6DF"
+                                        StrokeShape="RoundRectangle 8">
+                                    <VerticalStackLayout Spacing="0" BindableLayout.ItemsSource="{Binding SearchResults}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ProductRecord">
+                                                <VerticalStackLayout Spacing="0">
+                                                    <Grid Padding="12,10" ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                                        <Grid.GestureRecognizers>
+                                                            <TapGestureRecognizer Tapped="OnSearchResultTapped" />
+                                                        </Grid.GestureRecognizers>
+                                                        <VerticalStackLayout Spacing="2">
+                                                            <Label Text="{Binding Name}" FontFamily="Inter" FontSize="14" FontAttributes="Bold" TextColor="#242B28" />
+                                                            <Label Text="{Binding Code}" FontFamily="Inter" FontSize="12" TextColor="#727871" />
+                                                        </VerticalStackLayout>
+                                                        <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                                                            <Label Text="{Binding PriceText}" FontFamily="Inter" FontSize="14" FontAttributes="Bold" TextColor="#293F35" HorizontalTextAlignment="End" />
+                                                            <Label Text="{Binding StockText}" FontFamily="Inter" FontSize="11" TextColor="#727871" HorizontalTextAlignment="End" />
+                                                        </VerticalStackLayout>
+                                                    </Grid>
+                                                    <BoxView HeightRequest="1" Color="#E4E6DF" />
                                                 </VerticalStackLayout>
-                                                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
-                                                    <Label Text="{Binding PriceText}" FontFamily="Inter" FontSize="10" TextColor="#242B28" HorizontalTextAlignment="End" />
-                                                    <Label Text="{Binding StockText}" FontFamily="Inter" FontSize="9" TextColor="#727871" HorizontalTextAlignment="End" />
-                                                </VerticalStackLayout>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </VerticalStackLayout>
+                                </Border>
+
                                 <Label x:Name="NoProductsFoundLabel"
                                        Text="Nenhum produto encontrado no catálogo."
                                        IsVisible="False"
                                        FontFamily="Inter"
-                                       FontSize="10"
+                                       FontSize="12"
                                        TextColor="#727871" />
-                                <Grid ColumnDefinitions="160,*" ColumnSpacing="16">
+
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                                     <VerticalStackLayout Spacing="4">
-                                        <Label Text="Quantidade" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                                        <Border HeightRequest="44"
-                                                Padding="4,0"
+                                        <Label Text="Quantidade" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                        <Border MinimumHeightRequest="44"
+                                                Padding="2,0"
                                                 BackgroundColor="White"
                                                 Stroke="#D7DBD2"
                                                 StrokeShape="RoundRectangle 8">
-                                            <Grid ColumnDefinitions="44,*,44">
+                                            <Grid ColumnDefinitions="42,46,42" VerticalOptions="Center">
                                                 <Button Text="−"
                                                         FontSize="20"
                                                         BackgroundColor="Transparent"
                                                         TextColor="#293F35"
                                                         Padding="0"
+                                                        MinimumWidthRequest="40"
+                                                        MinimumHeightRequest="40"
                                                         Clicked="OnDecreaseQuantityClicked"
                                                         SemanticProperties.Description="Diminuir quantidade" />
                                                 <Label x:Name="QuantityLabel"
                                                        Grid.Column="1"
                                                        Text="1"
                                                        FontFamily="Inter"
-                                                       FontSize="12"
+                                                       FontSize="15"
+                                                       FontAttributes="Bold"
                                                        TextColor="#242B28"
                                                        HorizontalTextAlignment="Center"
                                                        VerticalTextAlignment="Center" />
@@ -124,57 +142,76 @@
                                                         BackgroundColor="Transparent"
                                                         TextColor="#293F35"
                                                         Padding="0"
+                                                        MinimumWidthRequest="40"
+                                                        MinimumHeightRequest="40"
                                                         Clicked="OnIncreaseQuantityClicked"
                                                         SemanticProperties.Description="Aumentar quantidade" />
                                             </Grid>
                                         </Border>
                                     </VerticalStackLayout>
                                     <Button Grid.Column="1"
-                                            Text="＋   Adicionar"
+                                            Text="＋  Adicionar"
                                             VerticalOptions="End"
-                                            HeightRequest="44"
+                                            MinimumHeightRequest="44"
                                             BackgroundColor="#293F35"
                                             TextColor="White"
                                             FontFamily="Inter"
-                                            FontSize="11"
+                                            FontSize="13"
                                             Clicked="OnAddProductClicked" />
                                 </Grid>
                             </VerticalStackLayout>
                         </Border>
+
                         <Border BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
                             <VerticalStackLayout Spacing="0">
-                                <Grid Padding="18,16" ColumnDefinitions="*,Auto">
-                                    <Label Text="Itens da venda" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
-                                    <Label x:Name="CartCountLabel" Grid.Column="1" Text="0 itens" FontFamily="Inter" FontSize="10" TextColor="#727871" VerticalTextAlignment="Center" />
+                                <Grid Padding="16,14" ColumnDefinitions="*,Auto">
+                                    <Label Text="Itens da venda" FontFamily="Inter" FontSize="16" FontAttributes="Bold" TextColor="#242B28" />
+                                    <Label x:Name="CartCountLabel" Grid.Column="1" Text="0 itens" FontFamily="Inter" FontSize="12" TextColor="#727871" VerticalTextAlignment="Center" />
                                 </Grid>
-                                <CollectionView ItemsSource="{Binding Cart}" SelectionMode="None">
-                                    <CollectionView.EmptyView>
-                                        <Label Text="Adicione produtos para iniciar a venda." Padding="20" FontFamily="Inter" FontSize="10" TextColor="#727871" HorizontalTextAlignment="Center" />
-                                    </CollectionView.EmptyView>
-                                    <CollectionView.ItemTemplate>
+                                <Label x:Name="EmptyCartLabel"
+                                       Text="Adicione produtos para iniciar a venda."
+                                       Padding="20"
+                                       FontFamily="Inter"
+                                       FontSize="13"
+                                       TextColor="#727871"
+                                       HorizontalTextAlignment="Center" />
+                                <VerticalStackLayout Spacing="0" BindableLayout.ItemsSource="{Binding Cart}">
+                                    <BindableLayout.ItemTemplate>
                                         <DataTemplate x:DataType="pages:CartLine">
-                                            <Grid Padding="18,12" ColumnDefinitions="2*,Auto,Auto,Auto" ColumnSpacing="12">
-                                                <VerticalStackLayout Spacing="3">
-                                                    <Label Text="{Binding Product.Name}" FontFamily="Inter" FontSize="11" TextColor="#242B28" />
-                                                    <Label Text="{Binding Product.Code}" FontFamily="Inter" FontSize="9" TextColor="#727871" />
-                                                </VerticalStackLayout>
-                                                <Label Grid.Column="1" Text="{Binding Quantity}" FontFamily="Inter" FontSize="10" TextColor="#242B28" VerticalTextAlignment="Center" />
-                                                <Label Grid.Column="2" Text="{Binding SubtotalText}" FontFamily="Inter" FontSize="10" TextColor="#242B28" VerticalTextAlignment="Center" />
-                                                <Button Grid.Column="3" Text="Remover" BackgroundColor="Transparent" TextColor="#B84F42" FontSize="9" Padding="4" Clicked="OnRemoveItemClicked" />
-                                            </Grid>
+                                            <VerticalStackLayout Spacing="0">
+                                                <Grid Padding="16,10" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+                                                    <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                                        <Label Text="{Binding Product.Name}" FontFamily="Inter" FontSize="14" TextColor="#242B28" LineBreakMode="TailTruncation" />
+                                                        <Label Text="{Binding Product.Code}" FontFamily="Inter" FontSize="11" TextColor="#727871" />
+                                                    </VerticalStackLayout>
+                                                    <Label Grid.Column="1" Text="{Binding Quantity, StringFormat='{0}x'}" FontFamily="Inter" FontSize="13" TextColor="#242B28" VerticalTextAlignment="Center" />
+                                                    <Label Grid.Column="2" Text="{Binding SubtotalText}" FontFamily="Inter" FontSize="14" FontAttributes="Bold" TextColor="#242B28" VerticalTextAlignment="Center" />
+                                                    <Button Grid.Column="3"
+                                                            Text="✕"
+                                                            BackgroundColor="Transparent"
+                                                            TextColor="#B84F42"
+                                                            FontSize="14"
+                                                            Padding="6,4"
+                                                            MinimumWidthRequest="36"
+                                                            MinimumHeightRequest="36"
+                                                            Clicked="OnRemoveItemClicked"
+                                                            SemanticProperties.Description="Remover item" />
+                                                </Grid>
+                                                <BoxView HeightRequest="1" Color="#E4E6DF" />
+                                            </VerticalStackLayout>
                                         </DataTemplate>
-                                    </CollectionView.ItemTemplate>
-                                </CollectionView>
+                                    </BindableLayout.ItemTemplate>
+                                </VerticalStackLayout>
                             </VerticalStackLayout>
                         </Border>
                     </VerticalStackLayout>
 
-                    <Border BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10">
+                    <Border BackgroundColor="White" Stroke="#D7DBD2" StrokeShape="RoundRectangle 10" VerticalOptions="Start">
                         <VerticalStackLayout Spacing="0">
-                            <VerticalStackLayout Padding="18" Spacing="12">
-                                <Label Text="Pagamento" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
-                                <Label Text="Forma de pagamento" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                                <Grid ColumnDefinitions="*,*" RowDefinitions="48,48" ColumnSpacing="8" RowSpacing="8">
+                            <VerticalStackLayout Padding="16" Spacing="12">
+                                <Label Text="Pagamento" FontFamily="Inter" FontSize="16" FontAttributes="Bold" TextColor="#242B28" />
+                                <Label Text="Forma de pagamento" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
                                     <Button x:Name="CashPaymentButton"
                                             Text="▣  Dinheiro"
                                             BackgroundColor="#EBEFE6"
@@ -182,7 +219,8 @@
                                             BorderColor="#52675E"
                                             BorderWidth="1"
                                             FontFamily="Inter"
-                                            FontSize="11"
+                                            FontSize="13"
+                                            Padding="10,12"
                                             Clicked="OnCashPaymentClicked" />
                                     <Button x:Name="PixPaymentButton"
                                             Grid.Column="1"
@@ -192,7 +230,8 @@
                                             BorderColor="#D7DBD2"
                                             BorderWidth="1"
                                             FontFamily="Inter"
-                                            FontSize="11"
+                                            FontSize="13"
+                                            Padding="10,12"
                                             Clicked="OnPixPaymentClicked" />
                                     <Button x:Name="CardPaymentButton"
                                             Grid.Row="1"
@@ -202,7 +241,8 @@
                                             BorderColor="#D7DBD2"
                                             BorderWidth="1"
                                             FontFamily="Inter"
-                                            FontSize="11"
+                                            FontSize="13"
+                                            Padding="10,12"
                                             Clicked="OnCardPaymentClicked" />
                                     <Button x:Name="PayLaterButton"
                                             Grid.Row="1"
@@ -213,36 +253,44 @@
                                             BorderColor="#D7DBD2"
                                             BorderWidth="1"
                                             FontFamily="Inter"
-                                            FontSize="11"
+                                            FontSize="13"
+                                            Padding="10,12"
                                             Clicked="OnPayLaterClicked" />
                                 </Grid>
                                 <Label x:Name="SelectedPaymentLabel"
                                        Text="Forma selecionada: Dinheiro"
                                        FontFamily="Inter"
-                                       FontSize="9"
+                                       FontSize="12"
                                        TextColor="#727871" />
-                                <VerticalStackLayout x:Name="CashPaymentPanel" Spacing="6">
-                                    <Label Text="Total pago / recebido (R$)" FontFamily="Inter" FontSize="10" TextColor="#242B28" />
-                                    <Entry x:Name="AmountReceivedEntry" Placeholder="Ex.: 100,00" Keyboard="Text"
-                                           TextChanged="OnAmountReceivedChanged" TextColor="#242B28" PlaceholderColor="#727871" BackgroundColor="White" />
+                                <VerticalStackLayout x:Name="CashPaymentPanel" Spacing="8">
+                                    <Label Text="Total pago / recebido (R$)" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
+                                    <Entry x:Name="AmountReceivedEntry"
+                                           Placeholder="Ex.: 100,00"
+                                           Keyboard="Numeric"
+                                           FontFamily="Inter"
+                                           FontSize="15"
+                                           TextChanged="OnAmountReceivedChanged"
+                                           TextColor="#242B28"
+                                           PlaceholderColor="#727871"
+                                           BackgroundColor="#F6F5F0" />
                                     <Grid ColumnDefinitions="*,Auto">
-                                        <Label Text="Troco" FontFamily="Inter" FontSize="12" TextColor="#242B28" />
-                                        <Label x:Name="ChangeLabel" Grid.Column="1" Text="R$ 0,00" FontFamily="Inter" FontSize="12" FontAttributes="Bold" TextColor="#293F35" />
+                                        <Label Text="Troco" FontFamily="Inter" FontSize="14" TextColor="#242B28" />
+                                        <Label x:Name="ChangeLabel" Grid.Column="1" Text="R$ 0,00" FontFamily="Inter" FontSize="15" FontAttributes="Bold" TextColor="#293F35" />
                                     </Grid>
                                 </VerticalStackLayout>
-                                <Label x:Name="PayLaterHint" Text="Ao concluir, informe o nome do devedor para registrar a venda pendente." IsVisible="False" FontFamily="Inter" FontSize="10" TextColor="#727871" />
+                                <Label x:Name="PayLaterHint" Text="Ao concluir, escolha um cliente existente ou digite o nome para somar na conta dele." IsVisible="False" FontFamily="Inter" FontSize="12" TextColor="#727871" />
                             </VerticalStackLayout>
-                            <BoxView HeightRequest="1" Margin="18,0" Color="#E4E6DF" />
-                            <VerticalStackLayout Padding="18" BackgroundColor="#293F35" Spacing="12">
+                            <BoxView HeightRequest="1" Margin="16,0" Color="#E4E6DF" />
+                            <VerticalStackLayout Padding="16" BackgroundColor="#293F35" Spacing="12">
                                 <Grid ColumnDefinitions="*,Auto">
                                     <VerticalStackLayout Spacing="4">
-                                        <Label Text="Total da venda" FontFamily="Inter" FontSize="10" TextColor="#D7DBD2" />
-                                        <Label x:Name="CartSummaryLabel" Text="0 itens" FontFamily="Inter" FontSize="9" TextColor="#B8C4B8" />
+                                        <Label Text="Total da venda" FontFamily="Inter" FontSize="12" TextColor="#D7DBD2" />
+                                        <Label x:Name="CartSummaryLabel" Text="0 itens" FontFamily="Inter" FontSize="11" TextColor="#B8C4B8" />
                                     </VerticalStackLayout>
-                                    <Label x:Name="TotalLabel" Grid.Column="1" Text="R$ 0,00" FontFamily="Inter" FontSize="22" TextColor="White" VerticalTextAlignment="Center" />
+                                    <Label x:Name="TotalLabel" Grid.Column="1" Text="R$ 0,00" FontFamily="Inter" FontSize="24" FontAttributes="Bold" TextColor="White" VerticalTextAlignment="Center" />
                                 </Grid>
-                                <Label x:Name="CheckoutErrorLabel" IsVisible="False" FontFamily="Inter" FontSize="10" TextColor="#FFD5CA" />
-                                <Button Text="Concluir venda   →" BackgroundColor="#D4E6B0" TextColor="#293F35" FontFamily="Inter" FontSize="11" Clicked="OnReceiveClicked" />
+                                <Label x:Name="CheckoutErrorLabel" IsVisible="False" FontFamily="Inter" FontSize="12" TextColor="#FFD5CA" />
+                                <Button Text="Concluir venda   →" BackgroundColor="#D4E6B0" TextColor="#293F35" FontFamily="Inter" FontAttributes="Bold" FontSize="14" Padding="14,12" Clicked="OnReceiveClicked" />
                             </VerticalStackLayout>
                         </VerticalStackLayout>
                     </Border>

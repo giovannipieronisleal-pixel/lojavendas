@@ -10,38 +10,27 @@ public partial class DebtorsPage : ContentPage
 {
     private readonly CommerceService _commerceService;
     private readonly ILogger<DebtorsPage> _logger;
-    private readonly ObservableCollection<SaleRecord> _debts = [];
+    private readonly ObservableCollection<CustomerAccount> _customers = [];
+    private IReadOnlyList<CustomerAccount> _allCustomers = [];
+    private bool _showPaidCustomers;
 
     public DebtorsPage(CommerceService commerceService, ILogger<DebtorsPage> logger)
     {
         InitializeComponent();
         _commerceService = commerceService;
         _logger = logger;
-        Debts = _debts;
+        Customers = _customers;
         BindingContext = this;
     }
 
-    public ObservableCollection<SaleRecord> Debts { get; }
+    public ObservableCollection<CustomerAccount> Customers { get; }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
         try
         {
-            var debts = await _commerceService.GetCreditSalesAsync();
-            var latestPaymentMethods = await _commerceService.GetLatestDebtPaymentMethodsAsync();
-            _debts.Clear();
-            foreach (var debt in debts)
-            {
-                if (latestPaymentMethods.TryGetValue(debt.Id, out var paymentMethod))
-                    debt.LatestPaymentMethodText = paymentMethod;
-                _debts.Add(debt);
-            }
-            var pendingDebts = debts.Where(debt => debt.CanReceivePayment).ToList();
-            OutstandingTotalLabel.Text = pendingDebts.Sum(debt => debt.Total - debt.AmountPaid)
-                .ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"));
-            OutstandingCountLabel.Text = $"{pendingDebts.Count} vendas pendentes";
-            DebtListTitle.Text = $"Vendas a prazo  {debts.Count}";
+            await RefreshDebtsAsync();
         }
         catch (Exception exception)
         {
@@ -51,20 +40,40 @@ public partial class DebtorsPage : ContentPage
     }
 
     private async void OnBackToSalesClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/sales");
+        await Shell.Current.GoToAsync(AppRoutes.Sales);
 
     private async void OnCheckoutClicked(object? sender, EventArgs e) =>
-        await Shell.Current.GoToAsync("//workspace/main/checkout");
+        await Shell.Current.GoToAsync(AppRoutes.Checkout);
 
-    private async void OnRegisterDebtPaymentClicked(object? sender, EventArgs e)
+    private void OnCustomerSearchTextChanged(object? sender, TextChangedEventArgs e) =>
+        ApplyFilter();
+
+    private void OnShowPaidToggleClicked(object? sender, EventArgs e)
     {
-        if (sender is not Button { BindingContext: SaleRecord sale })
+        _showPaidCustomers = !_showPaidCustomers;
+        ShowPaidToggle.Text = _showPaidCustomers ? "Ocultar quitados" : "Mostrar quitados";
+        ApplyFilter();
+    }
+
+    private void OnToggleSalesClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button { BindingContext: CustomerAccount account })
+            account.IsExpanded = !account.IsExpanded;
+    }
+
+    private async void OnReceiveFromCustomerClicked(object? sender, EventArgs e)
+    {
+        if (sender is not Button { BindingContext: CustomerAccount account })
             return;
 
-        var outstanding = sale.Total - sale.AmountPaid;
+        var outstanding = account.Outstanding;
+        if (outstanding <= 0)
+            return;
+
         var amountText = await DisplayPromptAsync(
             "Receber pagamento",
-            $"Saldo devedor: {FormatCurrency(outstanding)}. Informe o valor recebido:",
+            $"{account.Name}\nSaldo devedor: {FormatCurrency(outstanding)}.\n" +
+            "O valor é abatido primeiro das compras mais antigas. Informe o valor recebido:",
             "Continuar",
             "Cancelar",
             "Valor",
@@ -91,26 +100,26 @@ public partial class DebtorsPage : ContentPage
 
         try
         {
-            var payment = await _commerceService.RegisterDebtPaymentAsync(sale.Id, amount, paymentMethod);
-            var receipt = FormatReceipt(sale, payment);
+            var payments = await _commerceService.RegisterCustomerPaymentAsync(account.Name, amount, paymentMethod);
+            var salesById = account.Sales.ToDictionary(sale => sale.Id);
+            var receipt = FormatCustomerReceipt(account.Name, payments, salesById, outstanding - amount);
             await RefreshDebtsAsync();
 
-            var action = await DisplayActionSheetAsync(
-                $"Comprovante {payment.ReceiptNumber}",
-                "Fechar",
-                null,
-                "Compartilhar comprovante");
+            var title = payments.Count == 1
+                ? $"Comprovante {payments[0].ReceiptNumber}"
+                : "Comprovante de pagamento";
+            var action = await DisplayActionSheetAsync(title, "Fechar", null, "Compartilhar comprovante");
             if (action == "Compartilhar comprovante")
             {
                 await Share.Default.RequestAsync(new ShareTextRequest
                 {
-                    Title = $"Comprovante {payment.ReceiptNumber}",
+                    Title = title,
                     Text = receipt
                 });
             }
             else
             {
-                await DisplayAlertAsync($"Comprovante {payment.ReceiptNumber}", receipt, "OK");
+                await DisplayAlertAsync(title, receipt, "OK");
             }
         }
         catch (ArgumentException exception)
@@ -124,7 +133,7 @@ public partial class DebtorsPage : ContentPage
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Falha ao registrar pagamento da venda {SaleNumber}.", sale.SaleNumber);
+            _logger.LogError(exception, "Falha ao registrar pagamento do cliente {CustomerName}.", account.Name);
             await DisplayAlertAsync("Erro ao registrar pagamento", "Não foi possível registrar o pagamento no banco local.", "OK");
         }
     }
@@ -139,7 +148,7 @@ public partial class DebtorsPage : ContentPage
             var payments = await _commerceService.GetSalePaymentsAsync(sale.Id);
             if (payments.Count == 0)
             {
-                await DisplayAlertAsync("Comprovantes", "Ainda não há pagamentos registrados para esta dívida.", "OK");
+                await DisplayAlertAsync("Comprovantes", "Ainda não há pagamentos registrados para esta venda.", "OK");
                 return;
             }
 
@@ -180,21 +189,69 @@ public partial class DebtorsPage : ContentPage
 
     private async Task RefreshDebtsAsync()
     {
-        var debts = await _commerceService.GetCreditSalesAsync();
-        var latestPaymentMethods = await _commerceService.GetLatestDebtPaymentMethodsAsync();
-        _debts.Clear();
-        foreach (var debt in debts)
-        {
-            if (latestPaymentMethods.TryGetValue(debt.Id, out var paymentMethod))
-                debt.LatestPaymentMethodText = paymentMethod;
-            _debts.Add(debt);
-        }
+        var expandedKeys = _allCustomers
+            .Where(account => account.IsExpanded)
+            .Select(account => CommerceService.CustomerKey(account.Name))
+            .ToHashSet();
 
-        var pendingDebts = debts.Where(debt => debt.CanReceivePayment).ToList();
-        OutstandingTotalLabel.Text = pendingDebts.Sum(debt => debt.Total - debt.AmountPaid)
-            .ToString("C", CultureInfo.GetCultureInfo("pt-BR"));
-        OutstandingCountLabel.Text = $"{pendingDebts.Count} vendas pendentes";
-        DebtListTitle.Text = $"Vendas a prazo  {debts.Count}";
+        _allCustomers = await _commerceService.GetCustomerAccountsAsync();
+        foreach (var account in _allCustomers)
+            account.IsExpanded = expandedKeys.Contains(CommerceService.CustomerKey(account.Name));
+
+        var debtors = _allCustomers.Where(account => account.CanReceivePayment).ToList();
+        OutstandingTotalLabel.Text = FormatCurrency(debtors.Sum(account => account.Outstanding));
+        OutstandingCountLabel.Text = debtors.Count == 1
+            ? "1 cliente com saldo em aberto"
+            : $"{debtors.Count} clientes com saldo em aberto";
+
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        var query = CommerceService.CustomerKey(CustomerSearchEntry.Text);
+        var visible = _allCustomers
+            .Where(account => _showPaidCustomers || account.CanReceivePayment)
+            .Where(account => query.Length == 0 || CommerceService.CustomerKey(account.Name).Contains(query, StringComparison.Ordinal))
+            .ToList();
+
+        _customers.Clear();
+        foreach (var account in visible)
+            _customers.Add(account);
+
+        EmptyStateLayout.IsVisible = visible.Count == 0;
+        DebtListTitle.Text = $"Clientes  {visible.Count}";
+    }
+
+    private static string FormatCustomerReceipt(
+        string customerName,
+        IReadOnlyList<SalePaymentRecord> payments,
+        IReadOnlyDictionary<int, SaleRecord> salesById,
+        decimal remainingBalance)
+    {
+        var first = payments[0];
+        var lines = payments.Select(payment =>
+        {
+            var saleNumber = salesById.TryGetValue(payment.SaleId, out var sale) ? sale.SaleNumber : $"#{payment.SaleId}";
+            var status = payment.OutstandingAfter == 0 ? "quitada" : $"restam {FormatCurrency(payment.OutstandingAfter)}";
+            return $"  {payment.ReceiptNumber} · Venda {saleNumber}: {FormatCurrency(payment.Amount)} ({status})";
+        });
+
+        var sellers = payments
+            .Select(payment => salesById.TryGetValue(payment.SaleId, out var sale) ? sale.SellerName : null)
+            .Where(name => !string.IsNullOrWhiteSpace(name))
+            .Distinct();
+
+        return "COMPROVANTE DE PAGAMENTO\n\n" +
+               $"Cliente: {customerName}\n" +
+               $"Data: {first.CreatedAtText}\n" +
+               $"Forma de pagamento: {first.PaymentMethod}\n" +
+               $"Valor recebido: {FormatCurrency(payments.Sum(payment => payment.Amount))}\n\n" +
+               "Abatido em:\n" +
+               string.Join("\n", lines) + "\n\n" +
+               $"Saldo restante do cliente: {FormatCurrency(Math.Max(0, remainingBalance))}\n" +
+               $"Atendente(s) da venda: {string.Join(", ", sellers)}\n\n" +
+               "Comprovante comercial; não substitui nota fiscal.";
     }
 
     private static string FormatReceipt(SaleRecord sale, SalePaymentRecord payment) =>

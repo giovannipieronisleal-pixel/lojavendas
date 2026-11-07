@@ -6,64 +6,72 @@
     xmlns:views="clr-namespace:lojavendas.Views"
     x:Name="RootView">
     <Grid x:Name="LayoutGrid"
-          ColumnDefinitions="232,*"
+          ColumnDefinitions="240,*"
           BackgroundColor="#F6F5F0"
           SizeChanged="OnLayoutSizeChanged">
+        <!-- Barra lateral fixa (telas largas) -->
         <views:SidebarView x:Name="Sidebar" Grid.Column="0" />
 
-        <Grid x:Name="ContentGrid" Grid.Column="1" RowDefinitions="80,*">
+        <Grid x:Name="ContentGrid" Grid.Column="1" RowDefinitions="68,*">
             <Grid x:Name="HeaderGrid"
                   Grid.Row="0"
-                  Padding="24,0"
-                  ColumnDefinitions="*,Auto,Auto"
-                  ColumnSpacing="12"
+                  Padding="20,0"
+                  ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="10"
                   BackgroundColor="#F6F5F0">
-                <HorizontalStackLayout Grid.Column="0"
-                                       Spacing="12"
-                                       VerticalOptions="Center">
-                    <Label x:Name="AreaLabel"
-                           Text="Área interna"
-                           FontFamily="Inter"
-                           FontSize="11"
-                           TextColor="#727871"
-                           VerticalTextAlignment="Center" />
-                    <Label x:Name="BreadcrumbSeparator"
-                           Text="/"
-                           FontFamily="Inter"
-                           FontSize="11"
-                           TextColor="#9A9E96"
-                           VerticalTextAlignment="Center" />
-                    <Label x:Name="BreadcrumbLabel"
-                           FontFamily="Inter"
-                           FontSize="11"
-                           TextColor="#242B28"
-                           VerticalTextAlignment="Center" />
-                </HorizontalStackLayout>
                 <Button x:Name="MobileNavButton"
-                        Grid.Column="1"
+                        Grid.Column="0"
                         Text="☰"
                         FontSize="22"
                         TextColor="#293F35"
                         BackgroundColor="Transparent"
                         Padding="8,4"
+                        MinimumWidthRequest="44"
+                        MinimumHeightRequest="44"
                         IsVisible="False"
                         Clicked="OnMobileNavigationClicked"
                         SemanticProperties.Description="Abrir navegação" />
+                <HorizontalStackLayout Grid.Column="1"
+                                       Spacing="10"
+                                       VerticalOptions="Center">
+                    <Label x:Name="AreaLabel"
+                           Text="Área interna"
+                           FontFamily="Inter"
+                           FontSize="12"
+                           TextColor="#727871"
+                           VerticalTextAlignment="Center" />
+                    <Label x:Name="BreadcrumbSeparator"
+                           Text="/"
+                           FontFamily="Inter"
+                           FontSize="12"
+                           TextColor="#9A9E96"
+                           VerticalTextAlignment="Center" />
+                    <Label x:Name="BreadcrumbLabel"
+                           FontFamily="Inter"
+                           FontSize="13"
+                           FontAttributes="Bold"
+                           TextColor="#242B28"
+                           LineBreakMode="TailTruncation"
+                           VerticalTextAlignment="Center" />
+                </HorizontalStackLayout>
                 <Grid x:Name="ProfileGrid"
                       Grid.Column="2"
-                      ColumnDefinitions="32,*"
+                      ColumnDefinitions="36,Auto"
                       ColumnSpacing="10"
                       VerticalOptions="Center">
-                    <Border WidthRequest="32"
-                            HeightRequest="32"
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnProfileClicked" />
+                    </Grid.GestureRecognizers>
+                    <Border WidthRequest="36"
+                            HeightRequest="36"
                             BackgroundColor="#EBEFE6"
                             StrokeThickness="0"
-                            StrokeShape="RoundRectangle 16">
+                            StrokeShape="RoundRectangle 18">
                         <Label x:Name="ProfileInitialsLabel"
                                Text="?"
                                FontFamily="Inter"
                                FontAttributes="Bold"
-                               FontSize="9"
+                               FontSize="11"
                                TextColor="#293F35"
                                HorizontalTextAlignment="Center"
                                VerticalTextAlignment="Center" />
@@ -72,24 +80,17 @@
                                          Grid.Column="1"
                                          Spacing="1"
                                          VerticalOptions="Center">
-                    <Label x:Name="ProfileNameLabel"
-                           Text="Usuário"
-                           FontFamily="Inter"
-                           FontSize="11"
-                           TextColor="#242B28" />
-                    <Label x:Name="ProfileRoleLabel"
-                           Text="Funcionário"
-                           FontFamily="Inter"
-                           FontSize="9"
-                           TextColor="#727871" />
+                        <Label x:Name="ProfileNameLabel"
+                               Text="Usuário"
+                               FontFamily="Inter"
+                               FontSize="12"
+                               TextColor="#242B28" />
+                        <Label x:Name="ProfileRoleLabel"
+                               Text="Funcionário"
+                               FontFamily="Inter"
+                               FontSize="10"
+                               TextColor="#727871" />
                     </VerticalStackLayout>
-                    <Button Grid.ColumnSpan="2"
-                            BackgroundColor="Transparent"
-                            HorizontalOptions="Fill"
-                            VerticalOptions="Fill"
-                            Clicked="OnProfileClicked"
-                            SemanticProperties.Description="Abrir opções do usuário e sair"
-                            ZIndex="1" />
                 </Grid>
             </Grid>
             <BoxView Grid.Row="0"
@@ -97,12 +98,30 @@
                      VerticalOptions="End"
                      Color="#D7DBD2" />
 
-            <ScrollView Grid.Row="1">
+            <!--
+                HorizontalOptions="Fill" evita que o conteúdo encolha para a largura mínima no PC e no Android.
+                O limite de 1440px continua valendo em monitores muito largos.
+            -->
+            <ScrollView Grid.Row="1" HorizontalScrollBarVisibility="Never">
                 <ContentView x:Name="BodyHost"
                              Padding="24,20"
-                             HorizontalOptions="Center"
+                             HorizontalOptions="Fill"
                              MaximumWidthRequest="1440" />
             </ScrollView>
+        </Grid>
+
+        <!-- Gaveta lateral para celular / telas estreitas -->
+        <Grid x:Name="MobileDrawerOverlay"
+              Grid.ColumnSpan="2"
+              ColumnDefinitions="240,*"
+              IsVisible="False"
+              ZIndex="20">
+            <views:SidebarView x:Name="MobileSidebar" Grid.Column="0" />
+            <BoxView Grid.Column="1" Color="#66000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnDrawerBackdropTapped" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
         </Grid>
     </Grid>
 </ContentView>
